@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Giovannino - Platform Base</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #5c94fc;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #coin-counter {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      text-shadow: 0 3px 0 #000, 0 0 8px rgba(0, 0, 0, 0.75);
+      user-select: none;
+    }
+
+    #coin-counter img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 3px 0 #000) drop-shadow(0 0 8px rgba(0, 0, 0, 0.75));
+    }
+
+    #level-message {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 52px;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 0 4px 0 #000, 0 0 12px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+    }
+
+    #special-coins {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+      transform: translateX(-50%);
+      user-select: none;
+    }
+
+    #special-coins img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: brightness(0.2) grayscale(1) drop-shadow(0 3px 0 #000);
+    }
+
+    #special-coins img.collected {
+      filter: none;
+    }
+
+    #main-menu {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      text-shadow: 0 4px 0 #000, 0 0 12px rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.28);
+      user-select: none;
+    }
+
+    #main-menu h1 {
+      margin: 0;
+      font-size: clamp(48px, 8vw, 104px);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .level-selector {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .menu-arrow,
+    #play-button {
+      border: 4px solid #fff;
+      color: #fff;
+      font-family: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      text-shadow: 0 3px 0 #000;
+      box-shadow: 0 6px 0 #000;
+    }
+
+    .menu-arrow {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      background: #e52521;
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    .menu-arrow:disabled,
+    #play-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    #menu-level-title {
+      min-width: 320px;
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 900;
+    }
+
+    #menu-special-coins {
+      display: flex;
+      gap: 10px;
+    }
+
+    #menu-special-coins img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: brightness(0.2) grayscale(1) drop-shadow(0 3px 0 #000);
+    }
+
+    #menu-special-coins img.collected {
+      filter: none;
+    }
+
+    #play-button {
+      min-width: 240px;
+      min-height: 78px;
+      border-radius: 8px;
+      background: #2ecc40;
+      font-size: 34px;
+      padding: 14px 36px;
+    }
+
+    #winMenu {
+      position: absolute;
+      inset: 0;
+      z-index: 35;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      text-shadow: 0 4px 0 #000, 0 0 12px rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.58);
+      user-select: none;
+    }
+
+    #winMenu h2 {
+      margin: 0;
+      font-size: clamp(42px, 7vw, 82px);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .win-actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .win-actions button {
+      min-width: 220px;
+      min-height: 68px;
+      border: 4px solid #fff;
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 900;
+      text-shadow: 0 3px 0 #000;
+      box-shadow: 0 6px 0 #000;
+      cursor: pointer;
+    }
+
+    #win-main-menu {
+      background: #e52521;
+    }
+
+    #win-replay {
+      background: #2c7be5;
+    }
+
+    #win-next {
+      background: #2ecc40;
+    }
+
+    .win-actions button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    #gameOverMenu {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      text-shadow: 0 4px 0 #000, 0 0 12px rgba(0, 0, 0, 0.9);
+      background: rgba(120, 0, 0, 0.72);
+      user-select: none;
+    }
+
+    #gameOverMenu h2 {
+      margin: 0;
+      font-size: clamp(54px, 9vw, 108px);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .game-over-actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .game-over-actions button {
+      min-width: 240px;
+      min-height: 70px;
+      border: 4px solid #fff;
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 24px;
+      font-weight: 900;
+      text-shadow: 0 3px 0 #000;
+      box-shadow: 0 6px 0 #000;
+      cursor: pointer;
+    }
+
+    #game-over-main-menu {
+      background: #e52521;
+    }
+
+    #game-over-restart {
+      background: #2ecc40;
+    }
+  </style>
+</head>
+<body>
+  <div id="main-menu">
+    <h1>SUPER GIOVANNINO</h1>
+    <div class="level-selector">
+      <button id="prev-level" class="menu-arrow" type="button">◀</button>
+      <div id="menu-level-title">LIVELLO N. 1</div>
+      <button id="next-level" class="menu-arrow" type="button">▶</button>
+    </div>
+    <div id="menu-special-coins">
+      <img src="assets/moneta.png" alt="">
+      <img src="assets/moneta.png" alt="">
+      <img src="assets/moneta.png" alt="">
+    </div>
+    <button id="play-button" type="button">GIOCA</button>
+  </div>
+  <div id="special-coins">
+    <img src="assets/moneta.png" alt="">
+    <img src="assets/moneta.png" alt="">
+    <img src="assets/moneta.png" alt="">
+  </div>
+  <div id="coin-counter">
+    <img src="assets/soldatino.png" alt="">
+    <span id="coin-count">0</span>
+  </div>
+  <div id="level-message"></div>
+  <div id="winMenu">
+    <h2>LIVELLO COMPLETATO!</h2>
+    <div class="win-actions">
+      <button id="win-main-menu" type="button">MENU PRINCIPALE</button>
+      <button id="win-replay" type="button">RIGIOCA</button>
+      <button id="win-next" type="button">PROSSIMO LIVELLO</button>
+    </div>
+  </div>
+  <div id="gameOverMenu">
+    <h2>GAME OVER</h2>
+    <div class="game-over-actions">
+      <button id="game-over-main-menu" type="button">MENU PRINCIPALE</button>
+      <button id="game-over-restart" type="button">RICOMINCIA</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x5c94fc);
+
+    const worldHeight = 15;
+    const tileSize = 1;
+    const levelBottom = -6.5;
+    const SHOW_DEBUG_HITBOX = false;
+    const playerSize = 3;
+    const playerHitboxWidthScale = 0.65;
+    const playerHitboxHeightScale = 0.9;
+    const moveSpeed = 7;
+    const gravity = -30;
+    const jumpVelocity = 13;
+    const collidableObjects = [];
+    const coins = [];
+    const specialCoins = [];
+    const enemies = [];
+    const projectiles = [];
+    const levelObjects = [];
+    const coinSize = 0.9;
+    const specialCoinSize = 1.125;
+    const enemyHeight = 1.75;
+    const enemyWidth = 1.75;
+    const enemyHitboxWidth = 1.25;
+    const enemyHitboxHeight = 1.48;
+    const enemySpeed = 1.5;
+    const shooterHeight = 1.9;
+    const shooterWidth = 1.9;
+    const shooterHitboxWidth = 1.28;
+    const shooterHitboxHeight = 1.55;
+    const projectileSize = 0.32;
+    const projectileBaseSpeed = 5;
+    const barWidth = 8;
+    const barHeight = 8;
+    let coinCount = 0;
+    let currentLevelIndex = 0;
+    let selectedMenuLevel = 0;
+    let targetBar = null;
+    let isChangingLevel = false;
+    let isGameCompleted = false;
+    let isGameStarted = false;
+    let maxCameraX = 0;
+    let previousPlayerBottom = 0;
+
+    const camera = new THREE.OrthographicCamera();
+    camera.position.set(0, 0, 10);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const backgroundLayers = [];
+    const textureLoader = new THREE.TextureLoader();
+    const coinCounter = document.getElementById('coin-counter');
+    const coinCountLabel = document.getElementById('coin-count');
+    const specialCoinIcons = document.querySelectorAll('#special-coins img');
+    const mainMenu = document.getElementById('main-menu');
+    const prevLevelButton = document.getElementById('prev-level');
+    const nextLevelButton = document.getElementById('next-level');
+    const menuLevelTitle = document.getElementById('menu-level-title');
+    const menuSpecialCoinIcons = document.querySelectorAll('#menu-special-coins img');
+    const playButton = document.getElementById('play-button');
+    const levelMessage = document.getElementById('level-message');
+    const winMenu = document.getElementById('winMenu');
+    const winMainMenuButton = document.getElementById('win-main-menu');
+    const winReplayButton = document.getElementById('win-replay');
+    const winNextButton = document.getElementById('win-next');
+    const gameOverMenu = document.getElementById('gameOverMenu');
+    const gameOverMainMenuButton = document.getElementById('game-over-main-menu');
+    const gameOverRestartButton = document.getElementById('game-over-restart');
+
+    function loadTexture(path, useNearestFilter = false, onLoad = null) {
+      const texture = textureLoader.load(path, (loadedTexture) => {
+        if (onLoad) {
+          onLoad(loadedTexture);
+        }
+      });
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.magFilter = useNearestFilter ? THREE.NearestFilter : THREE.LinearFilter;
+      texture.minFilter = useNearestFilter ? THREE.NearestFilter : THREE.LinearFilter;
+      return texture;
+    }
+
+    function addBackgroundLayer(layer, parallax) {
+      backgroundLayers.push({ layer, parallax });
+      return layer;
+    }
+
+    function createBackgroundLayer(path, height, y, z, sourceHeight, parallax) {
+      const texture = loadTexture(path);
+      const width = 1000;
+      const sourceAspect = 2048 / sourceHeight;
+
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.repeat.x = width / (height * sourceAspect);
+
+      const geometry = new THREE.PlaneGeometry(width, height);
+      const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        depthWrite: false
+      });
+      const layer = new THREE.Mesh(geometry, material);
+      layer.position.set(0, y, z);
+      scene.add(layer);
+      return addBackgroundLayer(layer, parallax);
+    }
+
+    const skyTexture = loadTexture('assets/background/sky_color.png');
+    const skyGeometry = new THREE.PlaneGeometry(1000, worldHeight);
+    const skyMaterial = new THREE.MeshBasicMaterial({
+      map: skyTexture,
+      depthWrite: false
+    });
+    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+    sky.position.set(0, 0, -50);
+    scene.add(sky);
+    addBackgroundLayer(sky, 1);
+
+    const sunTexture = loadTexture('assets/background/sun.png');
+    const sunGeometry = new THREE.PlaneGeometry(3, 3.9);
+    const sunMaterial = new THREE.MeshBasicMaterial({
+      map: sunTexture,
+      transparent: true,
+      depthWrite: false
+    });
+    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    sun.position.set(-6, 4.3, -45);
+    scene.add(sun);
+
+    createBackgroundLayer('assets/background/farground_cloud_1.png', 0.8, 5.6, -40, 110, 0.2);
+    createBackgroundLayer('assets/background/farground_cloud_2.png', 2.1, 4.4, -35, 295, 0.25);
+    createBackgroundLayer('assets/background/mid_ground_cloud_2.png', 3.4, 2.6, -30, 474, 0.35);
+    createBackgroundLayer('assets/background/mid_ground_cloud_1.png', 6.6, 0.4, -25, 954, 0.45);
+    createBackgroundLayer('assets/background/mountains/farground_mountains.png', 2.4, -3.6, -20, 330, 0.55);
+    createBackgroundLayer('assets/background/mountains/midground_mountains.png', 0.9, -3.8, -15, 119, 0.7);
+    createBackgroundLayer('assets/background/mountains/foreground_mountains.png', 0.8, -4.2, -10, 109, 0.85);
+
+    const tileTextures = {
+      dirtLeft: loadTexture('assets/tileset/5.png', true),
+      grassLeft: loadTexture('assets/tileset/1.png', true),
+      dirtCenter: loadTexture('assets/tileset/6.png', true),
+      grassCenter: loadTexture('assets/tileset/2.png', true),
+      dirtRight: loadTexture('assets/tileset/7.png', true),
+      grassRight: loadTexture('assets/tileset/3.png', true),
+      dirtSingle: loadTexture('assets/tileset/8.png', true),
+      grassSingle: loadTexture('assets/tileset/4.png', true),
+      brick: loadTexture('assets/tileset/9.png', true)
+    };
+    const coinTexture = loadTexture('assets/soldatino.png', true);
+    const specialCoinTexture = loadTexture('assets/moneta.png', true);
+    const barTexture = loadTexture('assets/spritz.png', true);
+    const enemyTextures = {
+      idle: loadTexture('assets/renato_idle.png', true),
+      run1: loadTexture('assets/renato_run1.png', true),
+      run2: loadTexture('assets/renato_run2.png', true)
+    };
+    const shooterTextures = {
+      idle: loadTexture('assets/ciapet_idle.png', true),
+      reload: loadTexture('assets/ciapet_reload.png', true),
+      shoot: loadTexture('assets/ciapet_shoot.png', true)
+    };
+
+    const totalLevels = 30;
+
+    function generateLevelStructure(levelNumber) {
+      const level = Math.min(Math.max(levelNumber, 1), totalLevels);
+      const width = Math.round(40 + ((level - 1) / (totalLevels - 1)) * 300);
+      const map = Array.from({ length: 8 }, () => Array(width).fill(0));
+      const difficulty = level <= 10 ? 'easy' : level <= 20 ? 'medium' : 'hard';
+      const safeColumns = 5;
+      const platforms = [];
+      const hiddenSpecialPositions = [];
+      const aerialSpecialPositions = [];
+      const gapSpecialPositions = [];
+      const gapColumns = new Set();
+      const surfaceRow = 6;
+      const lowestFloatingBlockRow = surfaceRow - 2;
+
+      function fillGroundColumn(column) {
+        if (column < 0 || column >= width) {
+          return;
+        }
+
+        for (let row = 0; row < map.length; row += 1) {
+          if (row < surfaceRow && map[row][column] !== 5) {
+            map[row][column] = 0;
+          } else if (row === surfaceRow) {
+            map[row][column] = 1;
+          } else if (row > surfaceRow) {
+            map[row][column] = 2;
+          }
+        }
+
+        gapColumns.delete(column);
+      }
+
+      for (let column = 0; column < width; column += 1) {
+        fillGroundColumn(column);
+      }
+
+      function clearColumn(column) {
+        if (column < safeColumns || column > width - 13) {
+          return;
+        }
+
+        for (let row = 0; row < map.length; row += 1) {
+          map[row][column] = 0;
+        }
+
+        gapColumns.add(column);
+      }
+
+      function clearGap(start, length) {
+        for (let offset = 0; offset < length; offset += 1) {
+          clearColumn(start + offset);
+        }
+
+        gapSpecialPositions.push({
+          row: Math.max(1, surfaceRow - 3),
+          column: start + Math.floor(length / 2)
+        });
+      }
+
+      function placeHorizontal(row, start, length, value) {
+        const targetRow = value === 3 ? Math.min(row, lowestFloatingBlockRow) : row;
+
+        for (let offset = 0; offset < length; offset += 1) {
+          const column = start + offset;
+
+          if (column >= safeColumns && column < width - 3 && !gapColumns.has(column)) {
+            map[targetRow][column] = value;
+          }
+        }
+      }
+
+      function placeCoins(row, start, length) {
+        for (let offset = 0; offset < length; offset += 1) {
+          const column = start + offset;
+
+          if (column >= safeColumns && column < width - 3 && !gapColumns.has(column) && map[row][column] === 0) {
+            map[row][column] = 4;
+          }
+        }
+      }
+
+      function placeReachablePlatform(row, start, length) {
+        const platformRow = Math.min(Math.max(row, 3), lowestFloatingBlockRow);
+
+        placeHorizontal(platformRow, start, length, 3);
+        platforms.push({ row: platformRow, start, length });
+
+        if (platformRow <= 3) {
+          const stepStart = Math.max(start - 2, safeColumns);
+          placeHorizontal(4, stepStart, 2, 3);
+          platforms.push({ row: 4, start: stepStart, length: 2 });
+        }
+
+        placeCoins(Math.max(platformRow - 1, 0), start, length);
+      }
+
+      function placePlatformSegment(row, start, length) {
+        const platformRow = Math.min(row, lowestFloatingBlockRow);
+
+        if (platformRow < 1) {
+          return;
+        }
+
+        placeHorizontal(platformRow, start, length, 3);
+        platforms.push({ row: platformRow, start, length });
+        placeCoins(Math.max(platformRow - 1, 0), start, length);
+      }
+
+      function placeTower(start) {
+        const steps = [
+          { row: 4, start, length: 2 },
+          { row: 3, start: start + 3, length: 2 },
+          { row: 1, start: start + 6, length: 2 }
+        ];
+
+        for (const step of steps) {
+          if (step.start >= width - 14) {
+            continue;
+          }
+
+          placeHorizontal(step.row, step.start, step.length, 3);
+          platforms.push(step);
+          placeCoins(Math.max(step.row - 1, 0), step.start, step.length);
+        }
+
+        const topColumn = Math.min(start + 6, width - 14);
+        hiddenSpecialPositions.push({ row: 0, column: topColumn });
+
+        if (topColumn + 2 < width - 14 && !gapColumns.has(topColumn + 1) && !gapColumns.has(topColumn + 2)) {
+          map[0][topColumn + 1] = 4;
+          map[0][topColumn + 2] = 4;
+        }
+      }
+
+      function placeAirRoad(start, variant) {
+        const segments = [
+          { row: 4, start, length: 3 + (variant % 2) },
+          { row: 4, start: start + 4, length: 4 },
+          { row: 3, start: start + 8, length: 5 + (variant % 3) },
+          { row: 2, start: start + 14, length: 4 },
+          { row: 1, start: start + 18, length: 3 + (variant % 2) }
+        ];
+
+        for (const segment of segments) {
+          if (segment.start >= width - 14) {
+            continue;
+          }
+
+          placePlatformSegment(segment.row, segment.start, segment.length);
+        }
+
+        const topSegment = segments[segments.length - 1];
+        const specialColumn = Math.min(topSegment.start + Math.floor(topSegment.length / 2), width - 14);
+        aerialSpecialPositions.push({ row: 0, column: specialColumn });
+
+        if (specialColumn + 2 < width - 14 && !gapColumns.has(specialColumn + 1) && !gapColumns.has(specialColumn + 2)) {
+          map[0][specialColumn + 1] = 4;
+          map[0][specialColumn + 2] = 4;
+        }
+      }
+
+      const enemyMinSpacing = 8;
+      const enemySpawnColumns = [];
+
+      function isFarEnoughFromEnemies(column) {
+        return enemySpawnColumns.every((enemyColumn) => Math.abs(enemyColumn - column) >= enemyMinSpacing);
+      }
+
+      function placeEnemyMarker(row, column, value) {
+        if (row < 0 || row >= map.length || column < safeColumns || column >= width - 14) {
+          return false;
+        }
+
+        if (!isFarEnoughFromEnemies(column)) {
+          return false;
+        }
+
+        if (map[row][column] === 5 || map[row][column] === 6 || map[row][column] === 7 || map[row][column] === 8 || map[row][column] === 9) {
+          return false;
+        }
+
+        map[row][column] = value;
+        enemySpawnColumns.push(column);
+        return true;
+      }
+
+      function findEnemyColumn(preferredColumn, row, hasSupport) {
+        const minColumn = safeColumns + 6;
+        const maxColumn = width - 15;
+
+        for (let radius = 0; radius <= 18; radius += 1) {
+          const candidates = radius === 0
+            ? [preferredColumn]
+            : [preferredColumn - radius, preferredColumn + radius];
+
+          for (const candidate of candidates) {
+            const column = Math.min(Math.max(candidate, minColumn), maxColumn);
+
+            if (hasSupport(column) && isFarEnoughFromEnemies(column)) {
+              return column;
+            }
+          }
+        }
+
+        return null;
+      }
+
+      if (level >= 5) {
+        const gapCount = level < 10
+          ? 3 + Math.floor(level / 2)
+          : level < 20
+            ? 8 + Math.floor(level * 0.65)
+            : 18 + Math.floor((level - 20) * 1.35);
+        const gapMaxWidth = level < 10 ? 2 : 3;
+        const spacing = Math.max(6, Math.floor((width - 26) / Math.max(gapCount, 1)));
+
+        for (let index = 0; index < gapCount; index += 1) {
+          const start = safeColumns + 7 + index * spacing + ((level + index * 3) % 3);
+          const gapWidth = level < 10 ? 1 + (index % gapMaxWidth) : 2 + ((level + index) % (gapMaxWidth - 1));
+
+          clearGap(start, gapWidth);
+        }
+      }
+
+      const platformCount = level < 5
+        ? 3 + Math.floor(level / 3)
+        : level < 10
+          ? 8 + Math.floor(level / 2)
+          : level < 20
+            ? 15 + Math.floor(level * 0.45)
+            : 26 + Math.floor((level - 20) * 0.9);
+
+      for (let index = 0; index < platformCount; index += 1) {
+        const start = safeColumns + 6 + index * Math.max(5, Math.floor(width / (platformCount + 2)));
+        const platformLength = level < 5 ? 3 : level < 10 ? 3 + (index % 3) : 4 + (index % 4);
+        const row = level < 5 ? 4 : 2 + ((index + level) % 4);
+
+        placeReachablePlatform(row, start, platformLength);
+      }
+
+      if (level >= 5) {
+        const towerCount = Math.min(6, 2 + Math.floor((level - 5) / 5));
+        const towerSpacing = Math.max(14, Math.floor((width - 30) / (towerCount + 1)));
+
+        for (let index = 0; index < towerCount; index += 1) {
+          placeTower(safeColumns + 8 + towerSpacing * index + ((level + index) % 4));
+        }
+
+        const airRoadCount = level < 10 ? 2 : level < 20 ? 4 : 6;
+        const airRoadSpacing = Math.max(18, Math.floor((width - 36) / (airRoadCount + 1)));
+
+        for (let index = 0; index < airRoadCount; index += 1) {
+          placeAirRoad(safeColumns + 8 + airRoadSpacing * index + ((level + index * 2) % 5), index + level);
+        }
+      }
+
+      if (difficulty === 'hard') {
+        const wallCount = 4 + Math.floor((level - 21) / 2);
+        const spacing = Math.max(14, Math.floor(width / (wallCount + 2)));
+
+        for (let index = 0; index < wallCount; index += 1) {
+          const column = safeColumns + 12 + index * spacing;
+
+          if (column >= width - 8 || gapColumns.has(column)) {
+            continue;
+          }
+
+          map[4][column] = 3;
+          map[3][column] = index % 2 === 0 ? 3 : 0;
+          map[2][column] = index % 2 === 0 ? 0 : 3;
+        }
+      }
+
+      const coinStep = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 8;
+
+      for (let column = safeColumns + 3; column < width - 5; column += coinStep) {
+        const row = difficulty === 'easy' ? 5 : column % 2 === 0 ? 4 : 3;
+
+        if (!gapColumns.has(column) && map[row][column] === 0) {
+          map[row][column] = 4;
+        }
+      }
+
+      const enemyCount = level < 5
+        ? 1 + Math.floor(level / 5)
+        : level < 10
+          ? 6 + Math.floor(level * 0.8)
+          : level < 20
+            ? 14 + Math.floor(level * 0.85)
+            : 28 + Math.floor((level - 20) * 1.5);
+      const enemySpacing = Math.max(enemyMinSpacing, Math.floor((width - 24) / Math.max(enemyCount, 1)));
+
+      for (let index = 0; index < enemyCount; index += 1) {
+        const platform = platforms.length > 0 ? platforms[index % platforms.length] : null;
+        const usePlatform = platform && (level >= 5 || index % 2 === 1);
+        const preferredColumn = usePlatform
+          ? Math.min(platform.start + Math.floor(platform.length / 2), width - 14)
+          : safeColumns + 8 + index * enemySpacing + ((level + index * 2) % 5);
+        const markerRow = usePlatform ? platform.row - 1 : 5;
+
+        if (markerRow < 0) {
+          continue;
+        }
+
+        const column = findEnemyColumn(preferredColumn, markerRow, (candidateColumn) => {
+          if (usePlatform) {
+            const platformEnd = platform.start + platform.length - 1;
+            return candidateColumn >= platform.start &&
+              candidateColumn <= platformEnd &&
+              map[platform.row][candidateColumn] === 3;
+          }
+
+          return map[surfaceRow][candidateColumn] !== 0;
+        });
+
+        if (column === null) {
+          continue;
+        }
+
+        const type = difficulty === 'easy' && index < 2 ? 8 : index % 3 === 0 ? 8 : 7;
+        placeEnemyMarker(markerRow, column, type);
+      }
+
+      if (level >= 10) {
+        const shooterCount = level < 20 ? 3 + Math.floor((level - 10) / 2) : 8 + Math.floor((level - 20) * 0.6);
+        const shooterSpacing = Math.max(enemyMinSpacing, Math.floor((width - 34) / shooterCount));
+
+        for (let index = 0; index < shooterCount; index += 1) {
+          const groundColumn = safeColumns + 16 + index * shooterSpacing + ((level + index) % 6);
+
+          const shooterGroundColumn = findEnemyColumn(groundColumn, 5, (candidateColumn) => map[surfaceRow][candidateColumn] !== 0);
+
+          if (shooterGroundColumn !== null) {
+            placeEnemyMarker(5, shooterGroundColumn, 9);
+          }
+
+          if (index % 2 === 0) {
+            const platformColumn = Math.min(groundColumn + 5, width - 16);
+            if (!gapColumns.has(platformColumn)) {
+              map[4][platformColumn] = 3;
+            }
+            const shooterPlatformColumn = findEnemyColumn(platformColumn, 3, (candidateColumn) => (
+              candidateColumn === platformColumn && map[4][candidateColumn] === 3
+            ));
+
+            if (shooterPlatformColumn !== null && (map[3][shooterPlatformColumn] === 0 || map[3][shooterPlatformColumn] === 4)) {
+              placeEnemyMarker(3, shooterPlatformColumn, 9);
+            }
+          }
+        }
+      }
+
+      const specialPositions = [
+        Math.floor(width * 0.28),
+        Math.floor(width * 0.52),
+        Math.floor(width * 0.78)
+      ];
+      const usedRewardPositionKeys = new Set();
+      const rewardPositions = [
+        ...aerialSpecialPositions,
+        ...hiddenSpecialPositions,
+        ...gapSpecialPositions
+      ].filter((position) => {
+        const key = `${position.row}-${position.column}`;
+        const valid = position.column >= safeColumns + 4 &&
+          position.column < width - 14 &&
+          position.row >= 0 &&
+          position.row < map.length &&
+          !usedRewardPositionKeys.has(key);
+
+        if (valid) {
+          usedRewardPositionKeys.add(key);
+        }
+
+        return valid;
+      });
+
+      specialPositions.forEach((column, index) => {
+        if (rewardPositions[index]) {
+          map[rewardPositions[index].row][rewardPositions[index].column] = 6;
+          return;
+        }
+
+        const clampedColumn = Math.min(Math.max(column, safeColumns + 4), width - 14);
+        const row = difficulty === 'easy' ? 3 + (index % 2) : difficulty === 'medium' ? 2 + (index % 2) : 1 + (index % 3);
+
+        map[row][clampedColumn] = 6;
+      });
+
+      function isEnemyTile(value) {
+        return value === 7 || value === 8 || value === 9;
+      }
+
+      function removeUnsafeEnemy(row, column) {
+        if (!isEnemyTile(map[row]?.[column])) {
+          return;
+        }
+
+        map[row][column] = 0;
+      }
+
+      function getBrickPlatformRun(row, column) {
+        if (!map[row] || map[row][column] !== 3) {
+          return null;
+        }
+
+        let start = column;
+        let end = column;
+
+        while (start > 0 && map[row][start - 1] === 3) {
+          start -= 1;
+        }
+
+        while (end < width - 1 && map[row][end + 1] === 3) {
+          end += 1;
+        }
+
+        return {
+          start,
+          end,
+          length: end - start + 1
+        };
+      }
+
+      function hasSafeEnemyHeadroom(enemyRow, column) {
+        const requiredAirBlocks = 3;
+
+        if (enemyRow < requiredAirBlocks) {
+          return false;
+        }
+
+        for (let row = enemyRow - requiredAirBlocks; row < enemyRow; row += 1) {
+          if (map[row][column] !== 0) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      function clearLandingZoneAfterWideGaps() {
+        let column = safeColumns;
+
+        while (column < width - 13) {
+          if (map[surfaceRow][column] !== 0) {
+            column += 1;
+            continue;
+          }
+
+          const gapStart = column;
+
+          while (column < width - 13 && map[surfaceRow][column] === 0) {
+            column += 1;
+          }
+
+          const gapWidth = column - gapStart;
+
+          if (gapWidth < 2 || map[surfaceRow][column] !== 1) {
+            continue;
+          }
+
+          for (let landingColumn = column; landingColumn < Math.min(column + 2, width - 13); landingColumn += 1) {
+            for (let row = 0; row < surfaceRow; row += 1) {
+              removeUnsafeEnemy(row, landingColumn);
+            }
+          }
+        }
+      }
+
+      function applyAccessibilitySafetyChecks() {
+        for (let row = 0; row < surfaceRow; row += 1) {
+          for (let column = safeColumns; column < width - 13; column += 1) {
+            if (!isEnemyTile(map[row][column])) {
+              continue;
+            }
+
+            const supportRow = row + 1;
+            const platform = getBrickPlatformRun(supportRow, column);
+
+            if (!platform) {
+              continue;
+            }
+
+            if (platform.length === 1 || !hasSafeEnemyHeadroom(row, column)) {
+              removeUnsafeEnemy(row, column);
+            }
+          }
+        }
+
+        clearLandingZoneAfterWideGaps();
+      }
+
+      const barColumn = width - 11;
+
+      for (let column = barColumn; column < width; column += 1) {
+        for (let row = 0; row < 6; row += 1) {
+          if (map[row][column] !== 5) {
+            map[row][column] = 0;
+          }
+        }
+
+        fillGroundColumn(column);
+      }
+
+      map[5][barColumn] = 5;
+      applyAccessibilitySafetyChecks();
+
+      return map;
+    }
+
+    function getLevelMap(levelIndex = currentLevelIndex) {
+      return generateLevelStructure(levelIndex + 1);
+    }
+
+    const SPECIAL_COIN_SAVE_KEY = 'salvataggiMonete';
+    let salvataggiMonete = loadSpecialCoinSaves();
+
+    function loadSpecialCoinSaves() {
+      try {
+        return JSON.parse(localStorage.getItem(SPECIAL_COIN_SAVE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveSpecialCoinSaves() {
+      try {
+        localStorage.setItem(SPECIAL_COIN_SAVE_KEY, JSON.stringify(salvataggiMonete));
+      } catch {
+        // Salvataggio non disponibile.
+      }
+    }
+
+    function getLevelSaveKey(levelIndex = currentLevelIndex) {
+      return `livello${levelIndex}`;
+    }
+
+    function ensureLevelSpecialCoinSave(levelIndex = currentLevelIndex) {
+      const key = getLevelSaveKey(levelIndex);
+
+      if (!Array.isArray(salvataggiMonete[key])) {
+        salvataggiMonete[key] = [false, false, false];
+        saveSpecialCoinSaves();
+      }
+
+      return salvataggiMonete[key];
+    }
+
+    function updateSpecialCoinUI() {
+      const levelSave = ensureLevelSpecialCoinSave();
+
+      specialCoinIcons.forEach((icon, index) => {
+        icon.classList.toggle('collected', levelSave[index] === true);
+      });
+    }
+
+    function isLevelCompleted(levelIndex) {
+      return localStorage.getItem(`level_${levelIndex}_completed`) === 'true';
+    }
+
+    function saveLevelCompleted(levelIndex) {
+      localStorage.setItem(`level_${levelIndex}_completed`, 'true');
+    }
+
+    function isLevelUnlocked(levelIndex) {
+      return levelIndex === 0 || isLevelCompleted(levelIndex - 1);
+    }
+
+    function updateMenuSpecialCoinUI() {
+      const levelSave = ensureLevelSpecialCoinSave(selectedMenuLevel);
+
+      menuSpecialCoinIcons.forEach((icon, index) => {
+        icon.classList.toggle('collected', levelSave[index] === true);
+      });
+    }
+
+    function updateMainMenu() {
+      const unlocked = isLevelUnlocked(selectedMenuLevel);
+
+      menuLevelTitle.textContent = `LIVELLO N. ${selectedMenuLevel + 1}`;
+      prevLevelButton.disabled = selectedMenuLevel === 0;
+      nextLevelButton.disabled = selectedMenuLevel === totalLevels - 1;
+      playButton.disabled = !unlocked;
+      playButton.textContent = unlocked ? 'GIOCA' : 'BLOCCATO';
+      updateMenuSpecialCoinUI();
+    }
+
+    function showMainMenu() {
+      mainMenu.style.display = 'flex';
+      coinCounter.style.display = 'none';
+      document.getElementById('special-coins').style.display = 'none';
+      updateMainMenu();
+    }
+
+    function hideMainMenu() {
+      mainMenu.style.display = 'none';
+      coinCounter.style.display = 'flex';
+      document.getElementById('special-coins').style.display = 'flex';
+    }
+
+    function getTileTexture(map, tileType, row, column) {
+      if (tileType === 3) {
+        return tileTextures.brick;
+      }
+
+      const rowData = map[row];
+      const hasSameLeft = rowData[column - 1] === tileType;
+      const hasSameRight = rowData[column + 1] === tileType;
+
+      if (!hasSameLeft && !hasSameRight) {
+        return tileType === 1 ? tileTextures.grassSingle : tileTextures.dirtSingle;
+      }
+
+      if (!hasSameLeft) {
+        return tileType === 1 ? tileTextures.grassLeft : tileTextures.dirtLeft;
+      }
+
+      if (!hasSameRight) {
+        return tileType === 1 ? tileTextures.grassRight : tileTextures.dirtRight;
+      }
+
+      return tileType === 1 ? tileTextures.grassCenter : tileTextures.dirtCenter;
+    }
+
+    function trackLevelObject(mesh) {
+      levelObjects.push(mesh);
+      return mesh;
+    }
+
+    function createBounds(x, y, width, height) {
+      return {
+        left: x - width / 2,
+        right: x + width / 2,
+        top: y + height / 2,
+        bottom: y - height / 2
+      };
+    }
+
+    function clearCurrentLevel() {
+      for (const mesh of levelObjects) {
+        scene.remove(mesh);
+        mesh.geometry.dispose();
+        mesh.material.dispose();
+      }
+
+      levelObjects.length = 0;
+      collidableObjects.length = 0;
+      coins.length = 0;
+      specialCoins.length = 0;
+      enemies.length = 0;
+      projectiles.length = 0;
+      targetBar = null;
+    }
+
+    function getTileCenterY(map, row) {
+      return levelBottom + (map.length - 1 - row) * tileSize + tileSize / 2;
+    }
+
+    function getLevelSpawnPosition(map) {
+      for (let row = 0; row < map.length; row += 1) {
+        const tileType = map[row][0];
+
+        if (tileType === 1 || tileType === 2) {
+          const tileTop = getTileCenterY(map, row) + tileSize / 2;
+          return {
+            x: tileSize / 2,
+            y: tileTop + getPlayerHitboxHeight() / 2
+          };
+        }
+      }
+
+      return {
+        x: tileSize / 2,
+        y: levelBottom + getPlayerHitboxHeight() / 2
+      };
+    }
+
+    function getBrickPlatformInfo(map, enemyRow, enemyColumn) {
+      const platformRow = enemyRow + 1;
+
+      if (!map[platformRow] || map[platformRow][enemyColumn] !== 3) {
+        return null;
+      }
+
+      let start = enemyColumn;
+      let end = enemyColumn;
+
+      while (start > 0 && map[platformRow][start - 1] === 3) {
+        start -= 1;
+      }
+
+      while (end < map[platformRow].length - 1 && map[platformRow][end + 1] === 3) {
+        end += 1;
+      }
+
+      return {
+        row: platformRow,
+        start,
+        end,
+        length: end - start + 1
+      };
+    }
+
+    function generateLevel(map = getLevelMap(currentLevelIndex)) {
+      const levelSave = ensureLevelSpecialCoinSave();
+      let specialCoinIndex = 0;
+
+      if (player) {
+        const spawnPosition = getLevelSpawnPosition(map);
+        player.position.set(spawnPosition.x, spawnPosition.y, 0);
+        playerVelocity.set(0, 0);
+        playerFacingDirection = 1;
+        isGrounded = false;
+        jumpRequested = false;
+        maxCameraX = spawnPosition.x;
+        camera.position.x = maxCameraX;
+        updatePlayerVisualScale();
+        updatePlayerHitbox();
+      }
+
+      for (let row = 0; row < map.length; row += 1) {
+        for (let column = 0; column < map[row].length; column += 1) {
+          const tileType = map[row][column];
+
+          if (tileType === 0) {
+            continue;
+          }
+
+          const x = column * tileSize + tileSize / 2;
+          const y = getTileCenterY(map, row);
+
+          if (tileType === 4) {
+            const geometry = new THREE.PlaneGeometry(coinSize, coinSize);
+            const material = new THREE.MeshBasicMaterial({
+              map: coinTexture,
+              transparent: true,
+              alphaTest: 0.1
+            });
+            const coin = new THREE.Mesh(geometry, material);
+            coin.position.set(x, y, 0.1);
+            scene.add(trackLevelObject(coin));
+
+            coins.push({
+              mesh: coin,
+              ...createBounds(x, y, coinSize * 0.82, coinSize * 0.82)
+            });
+            continue;
+          }
+
+          if (tileType === 6) {
+            const collected = levelSave[specialCoinIndex] === true;
+            const currentSpecialCoinIndex = specialCoinIndex;
+            specialCoinIndex += 1;
+
+            if (collected) {
+              continue;
+            }
+
+            const geometry = new THREE.PlaneGeometry(specialCoinSize, specialCoinSize);
+            const material = new THREE.MeshBasicMaterial({
+              map: specialCoinTexture,
+              transparent: true,
+              alphaTest: 0.1
+            });
+            const specialCoin = new THREE.Mesh(geometry, material);
+            specialCoin.position.set(x, y, 0.15);
+            scene.add(trackLevelObject(specialCoin));
+
+            specialCoins.push({
+              mesh: specialCoin,
+              index: currentSpecialCoinIndex,
+              ...createBounds(x, y, specialCoinSize * 0.82, specialCoinSize * 0.82)
+            });
+            continue;
+          }
+
+          if (tileType === 5) {
+            const geometry = new THREE.PlaneGeometry(barWidth, barHeight);
+            const material = new THREE.MeshBasicMaterial({
+              map: barTexture,
+              transparent: true,
+              alphaTest: 0.1
+            });
+            const bar = new THREE.Mesh(geometry, material);
+            const barY = y + barHeight / 2 - tileSize / 2;
+            bar.position.set(x, barY, 0.2);
+            scene.add(trackLevelObject(bar));
+
+            targetBar = {
+              mesh: bar,
+              ...createBounds(x, barY, barWidth * 0.9, barHeight * 0.9)
+            };
+            continue;
+          }
+
+          if (tileType === 7 || tileType === 8) {
+            const platformInfo = getBrickPlatformInfo(map, row, column);
+            const enemyType = tileType === 7 && (!platformInfo || platformInfo.length >= 3) ? 'mobile' : 'fermo';
+            const enemyDirection = enemyType === 'mobile' && column % 2 === 0 ? -1 : 1;
+            const enemyTexture = createEnemyTexture(enemyTextures.idle, enemyDirection);
+
+            const geometry = new THREE.PlaneGeometry(enemyWidth, enemyHeight);
+            const material = new THREE.MeshBasicMaterial({
+              map: enemyTexture,
+              transparent: true,
+              alphaTest: 0.1
+            });
+            const enemyMesh = new THREE.Mesh(geometry, material);
+            const enemyY = y - tileSize / 2 + enemyHeight / 2 + 0.04;
+            enemyMesh.position.set(x, enemyY, 0.25);
+            scene.add(trackLevelObject(enemyMesh));
+
+            enemies.push({
+              mesh: enemyMesh,
+              type: enemyType,
+              direction: enemyDirection,
+              isDead: false,
+              animationTimer: 0,
+              animationFrame: 0,
+              platformBounds: platformInfo && enemyType === 'mobile' ? {
+                left: platformInfo.start * tileSize,
+                right: (platformInfo.end + 1) * tileSize
+              } : null,
+              currentTextureKey: `idle-${enemyDirection}`,
+              deathVelocityY: 0,
+              bounds: createBounds(x, enemyY, enemyHitboxWidth, enemyHitboxHeight)
+            });
+            continue;
+          }
+
+          if (tileType === 9) {
+            const shooterDirection = -1;
+            const shooterTexture = createShooterTexture(shooterTextures.idle);
+            const geometry = new THREE.PlaneGeometry(shooterWidth, shooterHeight);
+            const material = new THREE.MeshBasicMaterial({
+              map: shooterTexture,
+              transparent: true,
+              alphaTest: 0.1
+            });
+            const shooterMesh = new THREE.Mesh(geometry, material);
+            const shooterY = y - tileSize / 2 + shooterHeight / 2 + 0.04;
+            shooterMesh.position.set(x, shooterY, 0.3);
+            scene.add(trackLevelObject(shooterMesh));
+
+            enemies.push({
+              mesh: shooterMesh,
+              type: 'shooter',
+              direction: shooterDirection,
+              isDead: false,
+              state: 'idle',
+              actionTimer: 2 + Math.random() * 2,
+              reloadTimer: 0,
+              shootTimer: 0,
+              animationTimer: 0,
+              animationFrame: 0,
+              currentTextureKey: 'ciapet-idle',
+              deathVelocityY: 0,
+              bounds: createBounds(x, shooterY, shooterHitboxWidth, shooterHitboxHeight)
+            });
+            continue;
+          }
+
+          const geometry = new THREE.PlaneGeometry(tileSize, tileSize);
+          const material = new THREE.MeshBasicMaterial({
+            map: getTileTexture(map, tileType, row, column),
+            transparent: true,
+            alphaTest: 0.1
+          });
+          const tile = new THREE.Mesh(geometry, material);
+          tile.position.set(x, y, 0);
+          scene.add(trackLevelObject(tile));
+
+          collidableObjects.push({
+            mesh: tile,
+            ...createBounds(x, y, tileSize, tileSize)
+          });
+        }
+      }
+
+      updateSpecialCoinUI();
+    }
+
+    let player;
+    let currentPlayerTexture;
+    let playerFacingDirection = 1;
+
+    function loadPlayerTexture(path) {
+      const texture = loadTexture(path, true, (loadedTexture) => {
+        loadedTexture.userData.aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
+
+        if (loadedTexture === currentPlayerTexture) {
+          updatePlayerVisualScale();
+        }
+      });
+      texture.userData.aspectRatio = 1;
+      return texture;
+    }
+
+    const playerTextures = {
+      gioFermo: loadPlayerTexture('assets/giovannino_idle.png'),
+      gioSalto: loadPlayerTexture('assets/giovannino_jump.png'),
+      gioCorsa1: loadPlayerTexture('assets/giovannino_run1.png'),
+      gioCorsa2: loadPlayerTexture('assets/giovannino_run2.png')
+    };
+    const runAnimationFrameDelay = 8;
+    let animationFrame = 0;
+    currentPlayerTexture = playerTextures.gioFermo;
+
+    const playerGeometry = new THREE.PlaneGeometry(playerSize, playerSize);
+    const playerMaterial = new THREE.MeshBasicMaterial({
+      map: currentPlayerTexture,
+      transparent: true,
+      alphaTest: 0.1
+    });
+    player = new THREE.Mesh(playerGeometry, playerMaterial);
+    player.position.set(2.5, -5 + playerSize / 2, 0);
+    scene.add(player);
+    const playerHitbox = new THREE.Box2();
+    const playerHitboxGeometry = new THREE.BufferGeometry();
+    const playerHitboxVertices = new Float32Array(12);
+    playerHitboxGeometry.setAttribute('position', new THREE.BufferAttribute(playerHitboxVertices, 3));
+    const playerHitboxDebug = new THREE.LineLoop(
+      playerHitboxGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.65,
+        depthTest: false
+      })
+    );
+    playerHitboxDebug.visible = SHOW_DEBUG_HITBOX;
+    playerHitboxDebug.renderOrder = 1000;
+    scene.add(playerHitboxDebug);
+    updatePlayerVisualScale();
+
+    const clock = new THREE.Clock();
+    const keys = {
+      left: false,
+      right: false
+    };
+    const playerVelocity = new THREE.Vector2(0, 0);
+    let isGrounded = true;
+    let jumpRequested = false;
+
+    function setMovementKey(code, isPressed) {
+      if (code === 'ArrowLeft' || code === 'KeyA') {
+        keys.left = isPressed;
+        return true;
+      }
+
+      if (code === 'ArrowRight' || code === 'KeyD') {
+        keys.right = isPressed;
+        return true;
+      }
+
+      return false;
+    }
+
+    function handleKeyDown(event) {
+      const handledMovement = setMovementKey(event.code, true);
+
+      if (event.code === 'Space') {
+        if (!event.repeat) {
+          jumpRequested = true;
+        }
+        event.preventDefault();
+        return;
+      }
+
+      if (handledMovement) {
+        event.preventDefault();
+      }
+    }
+
+    function handleKeyUp(event) {
+      if (setMovementKey(event.code, false)) {
+        event.preventDefault();
+      }
+    }
+
+    function getPlayerHitboxWidth() {
+      return playerSize * Math.abs(player.scale.x) * playerHitboxWidthScale;
+    }
+
+    function getPlayerHitboxHeight() {
+      return playerSize * Math.abs(player.scale.y) * playerHitboxHeightScale;
+    }
+
+    function updatePlayerHitbox() {
+      const halfWidth = getPlayerHitboxWidth() / 2;
+      const halfHeight = getPlayerHitboxHeight() / 2;
+
+      playerHitbox.min.set(player.position.x - halfWidth, player.position.y - halfHeight);
+      playerHitbox.max.set(player.position.x + halfWidth, player.position.y + halfHeight);
+      updatePlayerHitboxDebug();
+    }
+
+    function updatePlayerHitboxDebug() {
+      playerHitboxDebug.visible = SHOW_DEBUG_HITBOX;
+
+      if (!SHOW_DEBUG_HITBOX) {
+        return;
+      }
+
+      const z = 0.7;
+      const vertices = playerHitboxGeometry.attributes.position.array;
+      vertices.set([
+        playerHitbox.min.x, playerHitbox.min.y, z,
+        playerHitbox.max.x, playerHitbox.min.y, z,
+        playerHitbox.max.x, playerHitbox.max.y, z,
+        playerHitbox.min.x, playerHitbox.max.y, z
+      ]);
+      playerHitboxGeometry.attributes.position.needsUpdate = true;
+      playerHitboxGeometry.computeBoundingSphere();
+    }
+
+    function getPlayerBoundsFromHitbox() {
+      return {
+        left: playerHitbox.min.x,
+        right: playerHitbox.max.x,
+        top: playerHitbox.max.y,
+        bottom: playerHitbox.min.y
+      };
+    }
+
+    function hasAABBOverlap(a, b) {
+      return a.right > b.left && a.left < b.right && a.top > b.bottom && a.bottom < b.top;
+    }
+
+    function isBlockUnderPlayerFeet(playerBounds, object) {
+      const horizontalOverlap = playerBounds.right > object.left + 0.04 && playerBounds.left < object.right - 0.04;
+      const playerWasAbove = previousPlayerBottom >= object.top - 0.12;
+      const playerIsAboveCenter = player.position.y >= (object.bottom + object.top) / 2;
+
+      return horizontalOverlap && playerWasAbove && playerIsAboveCenter;
+    }
+
+    function resolveHorizontalCollisions() {
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+
+      for (const object of collidableObjects) {
+        if (!hasAABBOverlap(playerBounds, object)) {
+          continue;
+        }
+
+        if (isBlockUnderPlayerFeet(playerBounds, object)) {
+          continue;
+        }
+
+        if (playerVelocity.x > 0) {
+          player.position.x = object.left - getPlayerHitboxWidth() / 2;
+        } else if (playerVelocity.x < 0) {
+          player.position.x = object.right + getPlayerHitboxWidth() / 2;
+        }
+
+        updatePlayerHitbox();
+        playerVelocity.x = 0;
+        return;
+      }
+    }
+
+    function resolveVerticalCollisions(previousBottom, previousTop) {
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+
+      for (const object of collidableObjects) {
+        if (!hasAABBOverlap(playerBounds, object)) {
+          continue;
+        }
+
+        const isLanding = playerVelocity.y <= 0 && previousBottom >= object.top;
+        const isHeadHit = playerVelocity.y > 0 && previousTop <= object.bottom;
+
+        if (isLanding) {
+          player.position.y = object.top + getPlayerHitboxHeight() / 2;
+          updatePlayerHitbox();
+          playerVelocity.y = 0;
+          isGrounded = true;
+          return;
+        }
+
+        if (isHeadHit) {
+          player.position.y = object.bottom - getPlayerHitboxHeight() / 2;
+          updatePlayerHitbox();
+          playerVelocity.y = -0.01;
+          return;
+        }
+      }
+    }
+
+    function getVisibleLeftEdge() {
+      return camera.position.x + camera.left;
+    }
+
+    function clampPlayerToCameraLeftEdge() {
+      const minPlayerX = getVisibleLeftEdge() + getPlayerHitboxWidth() / 2;
+
+      if (player.position.x < minPlayerX) {
+        player.position.x = minPlayerX;
+        playerVelocity.x = Math.max(playerVelocity.x, 0);
+        updatePlayerHitbox();
+      }
+    }
+
+    function updateCoinCounter() {
+      coinCountLabel.textContent = coinCount;
+    }
+
+    function showLevelMessage(text) {
+      levelMessage.textContent = text;
+      levelMessage.style.display = 'flex';
+    }
+
+    function hideLevelMessage() {
+      levelMessage.style.display = 'none';
+    }
+
+    function showWinMenu() {
+      winNextButton.disabled = currentLevelIndex >= totalLevels - 1;
+      winMenu.style.display = 'flex';
+      coinCounter.style.display = 'none';
+      document.getElementById('special-coins').style.display = 'none';
+    }
+
+    function hideWinMenu() {
+      winMenu.style.display = 'none';
+    }
+
+    function showGameOverMenu() {
+      isGameStarted = false;
+      isChangingLevel = false;
+      playerVelocity.set(0, 0);
+      gameOverMenu.style.display = 'flex';
+      coinCounter.style.display = 'none';
+      document.getElementById('special-coins').style.display = 'none';
+    }
+
+    function hideGameOverMenu() {
+      gameOverMenu.style.display = 'none';
+    }
+
+    function resetPlayerPosition() {
+      const spawnPosition = getLevelSpawnPosition(getLevelMap(currentLevelIndex));
+
+      player.position.set(spawnPosition.x, spawnPosition.y, 0);
+      playerVelocity.set(0, 0);
+      playerFacingDirection = 1;
+      isGrounded = false;
+      jumpRequested = false;
+      maxCameraX = spawnPosition.x;
+      camera.position.x = maxCameraX;
+      updatePlayerVisualScale();
+      updatePlayerHitbox();
+    }
+
+    function restartCurrentLevelFromGameOver() {
+      hideGameOverMenu();
+      clearCurrentLevel();
+      isGameStarted = true;
+      isChangingLevel = false;
+      isGameCompleted = false;
+      resetPlayerPosition();
+      generateLevel(getLevelMap(currentLevelIndex));
+      coinCounter.style.display = 'flex';
+      document.getElementById('special-coins').style.display = 'flex';
+      updateSpecialCoinUI();
+      updateCoinCounter();
+    }
+
+    function returnToMainMenuFromGameOver() {
+      hideGameOverMenu();
+      clearCurrentLevel();
+      isChangingLevel = false;
+      isGameCompleted = false;
+      isGameStarted = false;
+      showMainMenu();
+    }
+
+    function startSelectedLevel() {
+      if (!isLevelUnlocked(selectedMenuLevel)) {
+        updateMainMenu();
+        return;
+      }
+
+      clearCurrentLevel();
+      currentLevelIndex = selectedMenuLevel;
+      isGameStarted = true;
+      isChangingLevel = false;
+      isGameCompleted = false;
+      hideLevelMessage();
+      hideGameOverMenu();
+      hideMainMenu();
+      resetPlayerPosition();
+      generateLevel(getLevelMap(selectedMenuLevel));
+      updateSpecialCoinUI();
+      updateCoinCounter();
+    }
+
+    function restartCurrentLevel() {
+      hideWinMenu();
+      hideGameOverMenu();
+      clearCurrentLevel();
+      isGameStarted = true;
+      isChangingLevel = false;
+      isGameCompleted = false;
+      resetPlayerPosition();
+      generateLevel(getLevelMap(currentLevelIndex));
+      coinCounter.style.display = 'flex';
+      document.getElementById('special-coins').style.display = 'flex';
+      updateSpecialCoinUI();
+      updateCoinCounter();
+    }
+
+    function goToNextLevel() {
+      if (currentLevelIndex >= totalLevels - 1) {
+        return;
+      }
+
+      currentLevelIndex += 1;
+      selectedMenuLevel = currentLevelIndex;
+      hideWinMenu();
+      hideGameOverMenu();
+      clearCurrentLevel();
+      isGameStarted = true;
+      isChangingLevel = false;
+      isGameCompleted = false;
+      resetPlayerPosition();
+      generateLevel(getLevelMap(currentLevelIndex));
+      coinCounter.style.display = 'flex';
+      document.getElementById('special-coins').style.display = 'flex';
+      updateSpecialCoinUI();
+      updateCoinCounter();
+    }
+
+    function returnToMainMenuFromWin() {
+      hideWinMenu();
+      clearCurrentLevel();
+      selectedMenuLevel = Math.min(currentLevelIndex + 1, totalLevels - 1);
+      isChangingLevel = false;
+      isGameCompleted = false;
+      isGameStarted = false;
+      showMainMenu();
+    }
+
+    function collectCoins() {
+      if (!isGameStarted) {
+        return;
+      }
+
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+
+      for (let index = coins.length - 1; index >= 0; index -= 1) {
+        const coin = coins[index];
+
+        if (!hasAABBOverlap(playerBounds, coin)) {
+          continue;
+        }
+
+        scene.remove(coin.mesh);
+        coin.mesh.geometry.dispose();
+        coin.mesh.material.dispose();
+        const levelObjectIndex = levelObjects.indexOf(coin.mesh);
+
+        if (levelObjectIndex !== -1) {
+          levelObjects.splice(levelObjectIndex, 1);
+        }
+
+        coins.splice(index, 1);
+        coinCount += 1;
+        updateCoinCounter();
+      }
+    }
+
+    function collectSpecialCoins() {
+      if (!isGameStarted) {
+        return;
+      }
+
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+      const levelSave = ensureLevelSpecialCoinSave();
+
+      for (let index = specialCoins.length - 1; index >= 0; index -= 1) {
+        const specialCoin = specialCoins[index];
+
+        if (!hasAABBOverlap(playerBounds, specialCoin)) {
+          continue;
+        }
+
+        scene.remove(specialCoin.mesh);
+        specialCoin.mesh.geometry.dispose();
+        specialCoin.mesh.material.dispose();
+        const levelObjectIndex = levelObjects.indexOf(specialCoin.mesh);
+
+        if (levelObjectIndex !== -1) {
+          levelObjects.splice(levelObjectIndex, 1);
+        }
+
+        specialCoins.splice(index, 1);
+        levelSave[specialCoin.index] = true;
+        saveSpecialCoinSaves();
+        updateSpecialCoinUI();
+      }
+    }
+
+    function updateEnemyBounds(enemy) {
+      if (enemy.type === 'shooter') {
+        enemy.bounds = createBounds(
+          enemy.mesh.position.x,
+          enemy.mesh.position.y,
+          shooterHitboxWidth,
+          shooterHitboxHeight
+        );
+        return;
+      }
+
+      enemy.bounds = createBounds(
+        enemy.mesh.position.x,
+        enemy.mesh.position.y,
+        enemyHitboxWidth,
+        enemyHitboxHeight
+      );
+    }
+
+    function isSolidAtPoint(x, y) {
+      return collidableObjects.some((object) => (
+        x > object.left &&
+        x < object.right &&
+        y > object.bottom &&
+        y < object.top
+      ));
+    }
+
+    function wouldEnemyHitWall(enemy, nextX) {
+      const nextBounds = createBounds(nextX, enemy.mesh.position.y, enemyHitboxWidth, enemyHitboxHeight);
+
+      return collidableObjects.some((object) => hasAABBOverlap(nextBounds, object));
+    }
+
+    function createEnemyTexture(baseTexture, direction) {
+      const texture = baseTexture.clone();
+      texture.needsUpdate = true;
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.repeat.x = direction === 1 ? -1 : 1;
+      texture.offset.x = direction === 1 ? 1 : 0;
+      return texture;
+    }
+
+    function createShooterTexture(baseTexture) {
+      const texture = baseTexture.clone();
+      texture.needsUpdate = true;
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.repeat.x = -1;
+      texture.offset.x = 1;
+      return texture;
+    }
+
+    function setShooterTexture(enemy, texture, key) {
+      if (enemy.currentTextureKey === key) {
+        texture.dispose();
+        return;
+      }
+
+      if (enemy.mesh.material.map) {
+        enemy.mesh.material.map.dispose();
+      }
+
+      enemy.currentTextureKey = key;
+      enemy.mesh.material.map = texture;
+      enemy.mesh.material.needsUpdate = true;
+    }
+
+    function getProjectileSpeed() {
+      return projectileBaseSpeed + (currentLevelIndex * 0.2);
+    }
+
+    function spawnProjectile(enemy) {
+      const geometry = new THREE.PlaneGeometry(projectileSize, projectileSize);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xff5a1f,
+        transparent: true,
+        opacity: 0.95,
+        depthWrite: false
+      });
+      const projectileMesh = new THREE.Mesh(geometry, material);
+      const x = enemy.mesh.position.x + enemy.direction * (shooterHitboxWidth / 2 + projectileSize / 2);
+      const y = enemy.mesh.position.y + shooterHitboxHeight * 0.12;
+
+      projectileMesh.position.set(x, y, 0.55);
+      scene.add(trackLevelObject(projectileMesh));
+
+      projectiles.push({
+        mesh: projectileMesh,
+        velocityX: enemy.direction * getProjectileSpeed(),
+        bounds: createBounds(x, y, projectileSize, projectileSize)
+      });
+    }
+
+    function updateShooter(enemy, deltaTime) {
+      if (enemy.state === 'idle') {
+        enemy.actionTimer -= deltaTime;
+        setShooterTexture(enemy, createShooterTexture(shooterTextures.idle), 'ciapet-idle');
+
+        if (enemy.actionTimer <= 0) {
+          enemy.state = 'reload';
+          enemy.reloadTimer = 0.8;
+          setShooterTexture(enemy, createShooterTexture(shooterTextures.reload), 'ciapet-reload');
+        }
+
+        return;
+      }
+
+      if (enemy.state === 'reload') {
+        enemy.reloadTimer -= deltaTime;
+
+        if (enemy.reloadTimer <= 0) {
+          enemy.state = 'shoot';
+          enemy.shootTimer = 0.25;
+          setShooterTexture(enemy, createShooterTexture(shooterTextures.shoot), 'ciapet-shoot');
+          spawnProjectile(enemy);
+        }
+
+        return;
+      }
+
+      if (enemy.state === 'shoot') {
+        enemy.shootTimer -= deltaTime;
+
+        if (enemy.shootTimer <= 0) {
+          enemy.state = 'idle';
+          enemy.actionTimer = 2 + Math.random() * 2;
+          setShooterTexture(enemy, createShooterTexture(shooterTextures.idle), 'ciapet-idle');
+        }
+      }
+    }
+
+    function setEnemyTexture(enemy, texture, key) {
+      if (enemy.currentTextureKey === key) {
+        texture.dispose();
+        return;
+      }
+
+      if (enemy.mesh.material.map) {
+        enemy.mesh.material.map.dispose();
+      }
+
+      enemy.currentTextureKey = key;
+      enemy.mesh.material.map = texture;
+      enemy.mesh.material.needsUpdate = true;
+    }
+
+    function updateEnemyAnimation(enemy, deltaTime) {
+      if (enemy.type === 'fermo') {
+        enemy.animationTimer = 0;
+        if (enemy.currentTextureKey === `idle-${enemy.direction}`) {
+          return;
+        }
+        setEnemyTexture(enemy, createEnemyTexture(enemyTextures.idle, enemy.direction), `idle-${enemy.direction}`);
+        return;
+      }
+
+      enemy.animationTimer += deltaTime;
+
+      if (enemy.animationTimer < 0.15) {
+        return;
+      }
+
+      enemy.animationTimer = 0;
+      enemy.animationFrame = (enemy.animationFrame + 1) % 2;
+      const frameKey = enemy.animationFrame === 0 ? 'run1' : 'run2';
+      setEnemyTexture(
+        enemy,
+        createEnemyTexture(enemy.animationFrame === 0 ? enemyTextures.run1 : enemyTextures.run2, enemy.direction),
+        `${frameKey}-${enemy.direction}`
+      );
+    }
+
+    function updateEnemies(deltaTime) {
+      for (let index = enemies.length - 1; index >= 0; index -= 1) {
+        const enemy = enemies[index];
+
+        if (enemy.isDead) {
+          enemy.deathVelocityY += gravity * deltaTime;
+          enemy.mesh.position.y += enemy.deathVelocityY * deltaTime;
+
+          if (enemy.mesh.position.y < levelBottom - 6) {
+            scene.remove(enemy.mesh);
+            enemy.mesh.geometry.dispose();
+            enemy.mesh.material.dispose();
+            const levelObjectIndex = levelObjects.indexOf(enemy.mesh);
+
+            if (levelObjectIndex !== -1) {
+              levelObjects.splice(levelObjectIndex, 1);
+            }
+
+            enemies.splice(index, 1);
+          }
+
+          continue;
+        }
+
+        if (enemy.type === 'mobile') {
+          const nextX = enemy.mesh.position.x + enemy.direction * enemySpeed * deltaTime;
+          const footX = nextX + enemy.direction * (enemyHitboxWidth / 2 + 0.08);
+          const footY = enemy.bounds.bottom - 0.2;
+          const isGroundAhead = isSolidAtPoint(footX, footY);
+          const hitWall = wouldEnemyHitWall(enemy, nextX);
+          const outsidePlatform = enemy.platformBounds && (
+            nextX - enemyHitboxWidth / 2 < enemy.platformBounds.left + 0.04 ||
+            nextX + enemyHitboxWidth / 2 > enemy.platformBounds.right - 0.04
+          );
+
+          if (outsidePlatform || !isGroundAhead || hitWall) {
+            enemy.direction *= -1;
+          } else {
+            enemy.mesh.position.x = nextX;
+          }
+        }
+
+        if (enemy.type === 'shooter') {
+          updateShooter(enemy, deltaTime);
+        }
+
+        updateEnemyBounds(enemy);
+
+        if (enemy.type !== 'shooter') {
+          updateEnemyAnimation(enemy, deltaTime);
+        }
+      }
+    }
+
+    function updateProjectiles(deltaTime) {
+      for (let index = projectiles.length - 1; index >= 0; index -= 1) {
+        const projectile = projectiles[index];
+
+        projectile.mesh.position.x += projectile.velocityX * deltaTime;
+        projectile.bounds = createBounds(
+          projectile.mesh.position.x,
+          projectile.mesh.position.y,
+          projectileSize,
+          projectileSize
+        );
+
+        const hitSolid = collidableObjects.some((object) => hasAABBOverlap(projectile.bounds, object));
+        const offscreenLeft = projectile.mesh.position.x < camera.position.x + camera.left - 2;
+        const offscreenRight = projectile.mesh.position.x > camera.position.x + camera.right + 2;
+
+        if (hitSolid || offscreenLeft || offscreenRight) {
+          scene.remove(projectile.mesh);
+          projectile.mesh.geometry.dispose();
+          projectile.mesh.material.dispose();
+          const levelObjectIndex = levelObjects.indexOf(projectile.mesh);
+
+          if (levelObjectIndex !== -1) {
+            levelObjects.splice(levelObjectIndex, 1);
+          }
+
+          projectiles.splice(index, 1);
+        }
+      }
+    }
+
+    function removeTrackedMesh(mesh) {
+      scene.remove(mesh);
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+
+      const levelObjectIndex = levelObjects.indexOf(mesh);
+
+      if (levelObjectIndex !== -1) {
+        levelObjects.splice(levelObjectIndex, 1);
+      }
+    }
+
+    function cleanupOffscreenGroundTiles() {
+      if (!isGameStarted) {
+        return;
+      }
+
+      const cleanupLimit = camera.position.x + camera.left - 3;
+
+      for (let index = collidableObjects.length - 1; index >= 0; index -= 1) {
+        const object = collidableObjects[index];
+
+        if (object.right >= cleanupLimit) {
+          continue;
+        }
+
+        removeTrackedMesh(object.mesh);
+        collidableObjects.splice(index, 1);
+      }
+    }
+
+    function checkProjectileCollisions() {
+      if (!isGameStarted || isChangingLevel || isGameCompleted) {
+        return;
+      }
+
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+
+      for (const projectile of projectiles) {
+        if (hasAABBOverlap(playerBounds, projectile.bounds)) {
+          showGameOverMenu();
+          return;
+        }
+      }
+    }
+
+    function checkEnemyCollisions() {
+      if (!isGameStarted || isChangingLevel || isGameCompleted) {
+        return;
+      }
+
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+
+      for (const enemy of enemies) {
+        if (enemy.isDead || !hasAABBOverlap(playerBounds, enemy.bounds)) {
+          continue;
+        }
+
+        const stompedEnemy = playerVelocity.y < 0 && previousPlayerBottom >= enemy.bounds.top - 0.08;
+
+        if (stompedEnemy) {
+          enemy.isDead = true;
+          enemy.deathVelocityY = 1.5;
+          enemy.mesh.rotation.z = enemy.direction * 0.25;
+          playerVelocity.y = 8;
+          isGrounded = false;
+          return;
+        }
+
+        showGameOverMenu();
+        return;
+      }
+    }
+
+    function checkLevelComplete() {
+      if (!targetBar || isChangingLevel || isGameCompleted || !isGameStarted) {
+        return;
+      }
+
+      updatePlayerHitbox();
+
+      if (!hasAABBOverlap(getPlayerBoundsFromHitbox(), targetBar)) {
+        return;
+      }
+
+      isChangingLevel = true;
+      isGameStarted = false;
+      playerVelocity.set(0, 0);
+      saveLevelCompleted(currentLevelIndex);
+      showWinMenu();
+    }
+
+    function updatePlayer(deltaTime) {
+      if (!isGameStarted || isChangingLevel || isGameCompleted) {
+        playerVelocity.set(0, 0);
+        return;
+      }
+
+      const horizontalDirection = Number(keys.right) - Number(keys.left);
+      playerVelocity.x = horizontalDirection * moveSpeed;
+
+      if (horizontalDirection !== 0) {
+        playerFacingDirection = horizontalDirection;
+        updatePlayerVisualScale();
+      }
+
+      if (jumpRequested && isGrounded) {
+        playerVelocity.y = jumpVelocity;
+        isGrounded = false;
+      }
+
+      jumpRequested = false;
+      playerVelocity.y += gravity * deltaTime;
+
+      updatePlayerHitbox();
+      previousPlayerBottom = playerHitbox.min.y;
+      const previousBottom = previousPlayerBottom;
+      const previousTop = playerHitbox.max.y;
+
+      player.position.x += playerVelocity.x * deltaTime;
+      resolveHorizontalCollisions();
+      clampPlayerToCameraLeftEdge();
+
+      isGrounded = false;
+      player.position.y += playerVelocity.y * deltaTime;
+      resolveVerticalCollisions(previousBottom, previousTop);
+    }
+
+    function setPlayerTexture(texture) {
+      if (currentPlayerTexture === texture) {
+        return;
+      }
+
+      currentPlayerTexture = texture;
+      playerMaterial.map = texture;
+      playerMaterial.needsUpdate = true;
+      updatePlayerVisualScale();
+    }
+
+    function updatePlayerVisualScale() {
+      if (!player || !currentPlayerTexture) {
+        return;
+      }
+
+      const aspectRatio = currentPlayerTexture.userData.aspectRatio || 1;
+      player.scale.set(aspectRatio * playerFacingDirection, 1, 1);
+    }
+
+    function updatePlayerTexture() {
+      if (!isGrounded) {
+        setPlayerTexture(playerTextures.gioSalto);
+        return;
+      }
+
+      if (playerVelocity.x === 0) {
+        animationFrame = 0;
+        setPlayerTexture(playerTextures.gioFermo);
+        return;
+      }
+
+      animationFrame += 1;
+      const runFrame = Math.floor(animationFrame / runAnimationFrameDelay) % 2;
+      setPlayerTexture(runFrame === 0 ? playerTextures.gioCorsa1 : playerTextures.gioCorsa2);
+    }
+
+    function updateCameraBounds() {
+      const aspect = window.innerWidth / window.innerHeight;
+      const worldWidth = worldHeight * aspect;
+
+      camera.left = worldWidth / -2;
+      camera.right = worldWidth / 2;
+      camera.top = worldHeight / 2;
+      camera.bottom = worldHeight / -2;
+      camera.near = 0.1;
+      camera.far = 100;
+      camera.updateProjectionMatrix();
+    }
+
+    function handleResize() {
+      updateCameraBounds();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function updateCamera() {
+      if (isGameStarted) {
+        maxCameraX = Math.max(maxCameraX, player.position.x);
+      }
+
+      camera.position.x = maxCameraX;
+      camera.position.y = 0;
+      camera.lookAt(camera.position.x, camera.position.y, 0);
+
+      for (const { layer, parallax } of backgroundLayers) {
+        layer.position.x = camera.position.x * parallax;
+      }
+    }
+
+    function animate() {
+      const deltaTime = Math.min(clock.getDelta(), 0.05);
+
+      updatePlayerHitbox();
+      updatePlayer(deltaTime);
+      updateEnemies(deltaTime);
+      updateProjectiles(deltaTime);
+      updatePlayerHitbox();
+      collectCoins();
+      collectSpecialCoins();
+      checkProjectileCollisions();
+      checkEnemyCollisions();
+      checkLevelComplete();
+      updatePlayerTexture();
+      updateCamera();
+      cleanupOffscreenGroundTiles();
+      renderer.render(scene, camera);
+    }
+
+    updateCameraBounds();
+    updatePlayerHitbox();
+    updateCoinCounter();
+    updateSpecialCoinUI();
+    showMainMenu();
+    renderer.setAnimationLoop(animate);
+
+    prevLevelButton.addEventListener('click', () => {
+      if (selectedMenuLevel > 0) {
+        selectedMenuLevel -= 1;
+        updateMainMenu();
+      }
+    });
+
+    nextLevelButton.addEventListener('click', () => {
+      if (selectedMenuLevel < totalLevels - 1) {
+        selectedMenuLevel += 1;
+        updateMainMenu();
+      }
+    });
+
+    playButton.addEventListener('click', startSelectedLevel);
+    winMainMenuButton.addEventListener('click', returnToMainMenuFromWin);
+    winReplayButton.addEventListener('click', restartCurrentLevel);
+    winNextButton.addEventListener('click', goToNextLevel);
+    gameOverMainMenuButton.addEventListener('click', returnToMainMenuFromGameOver);
+    gameOverRestartButton.addEventListener('click', restartCurrentLevelFromGameOver);
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+  </script>
+</body>
+</html>
