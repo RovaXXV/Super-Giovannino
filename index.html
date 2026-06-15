@@ -44,17 +44,24 @@
 
     #level-message {
       position: absolute;
-      inset: 0;
+      top: 86px;
+      left: 50%;
       z-index: 20;
       display: none;
       align-items: center;
       justify-content: center;
+      max-width: min(760px, 92vw);
+      padding: 14px 20px;
+      border: 2px solid rgba(255, 115, 0, 0.92);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.44);
       color: #fff;
       font-family: Arial, Helvetica, sans-serif;
-      font-size: 52px;
+      font-size: clamp(20px, 3vw, 34px);
       font-weight: 800;
       text-align: center;
       text-shadow: 0 4px 0 #000, 0 0 12px rgba(0, 0, 0, 0.8);
+      transform: translateX(-50%);
       pointer-events: none;
     }
 
@@ -64,8 +71,14 @@
       left: 50%;
       z-index: 10;
       display: flex;
+      align-items: center;
       gap: 10px;
       transform: translateX(-50%);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      text-shadow: 0 3px 0 #000, 0 0 8px rgba(0, 0, 0, 0.75);
       user-select: none;
     }
 
@@ -81,6 +94,15 @@
       filter: none;
     }
 
+    #special-coin-count {
+      margin-left: 4px;
+      padding: 4px 10px;
+      border: 2px solid rgba(255, 115, 0, 0.85);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+    }
+
     #main-menu {
       position: absolute;
       inset: 0;
@@ -89,84 +111,254 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 28px;
+      gap: 20px;
+      padding: 24px;
+      box-sizing: border-box;
       color: #fff;
       font-family: Arial, Helvetica, sans-serif;
       text-align: center;
-      text-shadow: 0 4px 0 #000, 0 0 12px rgba(0, 0, 0, 0.8);
-      background: rgba(0, 0, 0, 0.28);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+      background-image: linear-gradient(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.18)), url("assets/sfondo.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       user-select: none;
     }
 
     #main-menu h1 {
       margin: 0;
-      font-size: clamp(48px, 8vw, 104px);
+      font-size: clamp(38px, 6vw, 78px);
       font-weight: 900;
       letter-spacing: 0;
+      color: #ffffff;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
     }
 
-    .level-selector {
-      display: flex;
-      align-items: center;
-      gap: 28px;
+    .menu-screen {
+      display: none;
+      width: min(860px, 94vw);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms ease, transform 220ms ease;
     }
 
-    .menu-arrow,
-    #play-button {
-      border: 4px solid #fff;
+    .menu-screen.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #zone-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .zone-card {
+      position: relative;
+      min-height: 190px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
       color: #fff;
       font-family: inherit;
-      font-weight: 900;
       cursor: pointer;
-      text-shadow: 0 3px 0 #000;
-      box-shadow: 0 6px 0 #000;
+      text-align: left;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(12px);
+      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
     }
 
-    .menu-arrow {
-      width: 72px;
-      height: 72px;
-      border-radius: 8px;
-      background: #e52521;
-      font-size: 38px;
-      line-height: 1;
+    .zone-card:not(:disabled):hover {
+      border-color: #ff7300;
+      background: rgba(255, 115, 0, 0.12);
+      box-shadow: 0 0 30px rgba(255, 115, 0, 0.68), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
     }
 
-    .menu-arrow:disabled,
-    #play-button:disabled {
+    .zone-card:disabled {
       cursor: not-allowed;
-      opacity: 0.55;
+      opacity: 0.35;
+      filter: grayscale(1);
+      background: rgba(0, 0, 0, 0.24);
     }
 
-    #menu-level-title {
-      min-width: 320px;
-      font-size: clamp(28px, 5vw, 52px);
+    .zone-card-title {
+      display: block;
+      color: #ffffff;
+      font-size: clamp(30px, 5vw, 54px);
       font-weight: 900;
+      line-height: 1;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
     }
 
-    #menu-special-coins {
+    .zone-card-subtitle {
+      display: block;
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .zone-progress {
+      display: block;
+      margin-top: 22px;
+      color: #ff7300;
+      font-size: 18px;
+      font-weight: 900;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+    }
+
+    .zone-panel {
+      width: 100%;
+      padding: 24px;
+      border: 1px solid rgba(255, 115, 0, 0.48);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 70px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(12px);
+    }
+
+    .zone-panel h2 {
+      margin: 0 0 18px;
+      font-size: clamp(24px, 4vw, 42px);
+      font-weight: 900;
+      letter-spacing: 0;
+      color: #ffffff;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    }
+
+    #level-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .level-card {
+      position: relative;
+      min-height: 118px;
+      border: 1px solid rgba(255, 115, 0, 0.46);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 18px rgba(0, 0, 0, 0.18);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .level-card:not(:disabled):hover {
+      border-color: #ff7300;
+      background: rgba(255, 115, 0, 0.14);
+      box-shadow: 0 0 26px rgba(255, 115, 0, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .level-card:disabled {
+      cursor: not-allowed;
+      opacity: 0.38;
+      filter: grayscale(1);
+      background: rgba(0, 0, 0, 0.24);
+    }
+
+    .level-number {
+      display: block;
+      margin-top: 16px;
+      font-size: clamp(38px, 6vw, 62px);
+      font-weight: 900;
+      line-height: 1;
+      color: #ff7300;
+    }
+
+    .level-lock {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 26px;
+    }
+
+    .level-card-coins {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 12px;
     }
 
-    #menu-special-coins img {
-      width: 54px;
-      height: 54px;
+    .level-card-coins img {
+      width: 22px;
+      height: 22px;
       object-fit: contain;
       image-rendering: pixelated;
-      filter: brightness(0.2) grayscale(1) drop-shadow(0 3px 0 #000);
+      opacity: 0.3;
+      filter: grayscale(100%) drop-shadow(0 2px 0 #000);
     }
 
-    #menu-special-coins img.collected {
+    .level-card-coins img.collected {
+      opacity: 1;
       filter: none;
     }
 
-    #play-button {
-      min-width: 240px;
-      min-height: 78px;
-      border-radius: 8px;
-      background: #2ecc40;
-      font-size: 34px;
-      padding: 14px 36px;
+    .zone-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .zone-page-button {
+      min-width: 170px;
+      min-height: 48px;
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 10px;
+      background: #ff7300;
+      color: #fff;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 6px 18px rgba(255, 115, 0, 0.36);
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .zone-page-button:not(:disabled):hover {
+      background: #ff8a1f;
+      box-shadow: 0 0 24px rgba(255, 115, 0, 0.8);
+      transform: translateY(-1px);
+    }
+
+    .zone-page-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+    }
+
+    #zone-page-label {
+      min-width: 92px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #ff7300;
+    }
+
+    .back-to-zones {
+      display: block;
+      margin: 0 0 14px;
+      min-width: 210px;
+    }
+
+    @media (max-width: 680px) {
+      #zone-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .zone-card {
+        min-height: 132px;
+      }
     }
 
     #winMenu {
@@ -283,27 +475,246 @@
     #game-over-restart {
       background: #2ecc40;
     }
+
+    #pauseButton {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 26;
+      display: none;
+      width: 48px;
+      height: 48px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      background: rgba(255, 102, 0, 0.82);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(255, 102, 0, 0.55);
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    #pauseMenu {
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
+    }
+
+    #pauseMenu h2 {
+      margin: 0 0 10px;
+      color: #ffffff;
+      font-size: clamp(42px, 7vw, 84px);
+      font-weight: 900;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    }
+
+    .pause-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: min(320px, 82vw);
+    }
+
+    .pause-actions button {
+      min-height: 58px;
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 10px;
+      background: #ff7300;
+      color: #fff;
+      font-family: inherit;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 6px 18px rgba(255, 115, 0, 0.36);
+    }
+
+    #mobileControls {
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      display: none;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
+    }
+
+    #joystickBase {
+      position: absolute;
+      left: 28px;
+      bottom: 28px;
+      width: 100px;
+      height: 100px;
+      border: 4px solid rgba(220, 220, 220, 0.85);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      box-sizing: border-box;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    #joystickHandle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(55, 55, 55, 0.92);
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    #jumpButton {
+      position: absolute;
+      right: 28px;
+      bottom: 34px;
+      width: 104px;
+      height: 104px;
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      background: rgba(229, 37, 33, 0.9);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      text-shadow: 0 2px 0 #000;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.55);
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    @media (pointer: coarse) {
+      #mobileControls {
+        display: block;
+      }
+    }
+
+    #rotateMessage {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 28px;
+      box-sizing: border-box;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: clamp(24px, 7vw, 44px);
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
+      text-shadow: 0 3px 0 #222;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    .rotate-phone-icon {
+      width: 76px;
+      height: 124px;
+      border: 7px solid #fff;
+      border-radius: 18px;
+      position: relative;
+      animation: rotatePhoneHint 1.4s ease-in-out infinite;
+    }
+
+    .rotate-phone-icon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translateX(-50%);
+    }
+
+    @keyframes rotatePhoneHint {
+      0%,
+      100% {
+        transform: rotate(0deg);
+      }
+
+      50% {
+        transform: rotate(90deg);
+      }
+    }
+
+    @media (pointer: coarse) and (orientation: portrait) {
+      #rotateMessage {
+        display: flex;
+      }
+
+      canvas,
+      #mobileControls {
+        display: none !important;
+      }
+    }
+
+    @media (pointer: coarse) and (orientation: landscape) {
+      #rotateMessage {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
+  <div id="rotateMessage">
+    <div class="rotate-phone-icon"></div>
+    <div>Per giocare, ruota il dispositivo in orizzontale</div>
+  </div>
   <div id="main-menu">
     <h1>SUPER GIOVANNINO</h1>
-    <div class="level-selector">
-      <button id="prev-level" class="menu-arrow" type="button">◀</button>
-      <div id="menu-level-title">LIVELLO N. 1</div>
-      <button id="next-level" class="menu-arrow" type="button">▶</button>
+    <div id="zone-hub" class="menu-screen active">
+      <div id="zone-grid"></div>
     </div>
-    <div id="menu-special-coins">
-      <img src="assets/moneta.png" alt="">
-      <img src="assets/moneta.png" alt="">
-      <img src="assets/moneta.png" alt="">
+    <div id="zone-levels" class="menu-screen">
+      <button id="back-to-zones" class="zone-page-button back-to-zones" type="button">◀ TORNA ALLE ZONE</button>
+      <div class="zone-panel">
+        <h2 id="selected-zone-title">ZONA 1: L'Inizio dell'Avventura</h2>
+        <div id="level-grid"></div>
+        <div class="zone-pagination">
+          <button id="prev-zone-page" class="zone-page-button" type="button">◀ Precedente</button>
+          <div id="zone-page-label">1 / 3</div>
+          <button id="next-zone-page" class="zone-page-button" type="button">Successivo ▶</button>
+        </div>
+      </div>
     </div>
-    <button id="play-button" type="button">GIOCA</button>
   </div>
   <div id="special-coins">
     <img src="assets/moneta.png" alt="">
     <img src="assets/moneta.png" alt="">
     <img src="assets/moneta.png" alt="">
+    <span id="special-coin-count">Monete: 0 / 3</span>
   </div>
   <div id="coin-counter">
     <img src="assets/soldatino.png" alt="">
@@ -325,6 +736,21 @@
       <button id="game-over-restart" type="button">RICOMINCIA</button>
     </div>
   </div>
+  <button id="pauseButton" type="button">║</button>
+  <div id="pauseMenu">
+    <h2>GIOCO IN PAUSA</h2>
+    <div class="pause-actions">
+      <button id="resumeButton" type="button">RIPRENDI</button>
+      <button id="pauseRestartButton" type="button">RICOMINCIA</button>
+      <button id="pauseMainMenuButton" type="button">TORNA AL MENU</button>
+    </div>
+  </div>
+  <div id="mobileControls">
+    <div id="joystickBase">
+      <div id="joystickHandle"></div>
+    </div>
+    <button id="jumpButton" type="button">SALTA</button>
+  </div>
 
   <script type="module">
     import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
@@ -335,7 +761,7 @@
     const worldHeight = 15;
     const tileSize = 1;
     const levelBottom = -6.5;
-    const SHOW_DEBUG_HITBOX = false;
+    const SHOW_DEBUG_HITBOXES = true;
     const playerSize = 3;
     const playerHitboxWidthScale = 0.65;
     const playerHitboxHeightScale = 0.9;
@@ -347,7 +773,9 @@
     const specialCoins = [];
     const enemies = [];
     const projectiles = [];
+    const dustParticles = [];
     const levelObjects = [];
+    const blockHitboxHelpers = [];
     const coinSize = 0.9;
     const specialCoinSize = 1.125;
     const enemyHeight = 1.75;
@@ -357,21 +785,39 @@
     const enemySpeed = 1.5;
     const shooterHeight = 1.9;
     const shooterWidth = 1.9;
-    const shooterHitboxWidth = 1.28;
-    const shooterHitboxHeight = 1.55;
+    const shooterHitboxWidth = shooterWidth * 0.595;
+    const shooterHitboxHeight = shooterHeight * 0.68;
+    const shooterHitboxBasePadding = 0.08;
     const projectileSize = 0.32;
     const projectileBaseSpeed = 5;
     const barWidth = 8;
     const barHeight = 8;
     let coinCount = 0;
+    let currentLevelCoinsCollected = 0;
+    let currentLevelSpecialCoins = [false, false, false];
+    let levelGateMessageTimer = null;
     let currentLevelIndex = 0;
     let selectedMenuLevel = 0;
+    let selectedZoneIndex = 0;
+    let selectedZonePage = 0;
+    const levelsPerZone = 20;
+    const zoneCount = 4;
+    const levelsPerZonePage = 9;
     let targetBar = null;
     let isChangingLevel = false;
     let isGameCompleted = false;
     let isGameStarted = false;
+    let isPaused = false;
     let maxCameraX = 0;
     let previousPlayerBottom = 0;
+    const cullingLeftDistance = 15;
+    const cullingRightDistance = 25;
+    const permanentRemovalDistance = 25;
+    let screenShakeTimer = 0;
+    let screenShakeDuration = 0;
+    let screenShakeIntensity = 0;
+    let damageFlashTimer = 0;
+    let runDustTimer = 0;
 
     const camera = new THREE.OrthographicCamera();
     camera.position.set(0, 0, 10);
@@ -387,12 +833,17 @@
     const coinCounter = document.getElementById('coin-counter');
     const coinCountLabel = document.getElementById('coin-count');
     const specialCoinIcons = document.querySelectorAll('#special-coins img');
+    const specialCoinCountLabel = document.getElementById('special-coin-count');
     const mainMenu = document.getElementById('main-menu');
-    const prevLevelButton = document.getElementById('prev-level');
-    const nextLevelButton = document.getElementById('next-level');
-    const menuLevelTitle = document.getElementById('menu-level-title');
-    const menuSpecialCoinIcons = document.querySelectorAll('#menu-special-coins img');
-    const playButton = document.getElementById('play-button');
+    const zoneHub = document.getElementById('zone-hub');
+    const zoneLevels = document.getElementById('zone-levels');
+    const zoneGrid = document.getElementById('zone-grid');
+    const selectedZoneTitle = document.getElementById('selected-zone-title');
+    const backToZonesButton = document.getElementById('back-to-zones');
+    const levelGrid = document.getElementById('level-grid');
+    const prevZonePageButton = document.getElementById('prev-zone-page');
+    const nextZonePageButton = document.getElementById('next-zone-page');
+    const zonePageLabel = document.getElementById('zone-page-label');
     const levelMessage = document.getElementById('level-message');
     const winMenu = document.getElementById('winMenu');
     const winMainMenuButton = document.getElementById('win-main-menu');
@@ -401,6 +852,15 @@
     const gameOverMenu = document.getElementById('gameOverMenu');
     const gameOverMainMenuButton = document.getElementById('game-over-main-menu');
     const gameOverRestartButton = document.getElementById('game-over-restart');
+    const pauseButton = document.getElementById('pauseButton');
+    const pauseMenu = document.getElementById('pauseMenu');
+    const resumeButton = document.getElementById('resumeButton');
+    const pauseRestartButton = document.getElementById('pauseRestartButton');
+    const pauseMainMenuButton = document.getElementById('pauseMainMenuButton');
+    const mobileControls = document.getElementById('mobileControls');
+    const joystickBase = document.getElementById('joystickBase');
+    const joystickHandle = document.getElementById('joystickHandle');
+    const jumpButton = document.getElementById('jumpButton');
 
     function loadTexture(path, useNearestFilter = false, onLoad = null) {
       const texture = textureLoader.load(path, (loadedTexture) => {
@@ -494,514 +954,1030 @@
       shoot: loadTexture('assets/ciapet_shoot.png', true)
     };
 
-    const totalLevels = 30;
+    const totalLevels = 80;
 
-    function generateLevelStructure(levelNumber) {
+    function generateLevelStructureLegacy(levelNumber) {
       const level = Math.min(Math.max(levelNumber, 1), totalLevels);
-      const width = Math.round(40 + ((level - 1) / (totalLevels - 1)) * 300);
+      const progress = totalLevels <= 1 ? 0 : (level - 1) / (totalLevels - 1);
+      const width = Math.round(200 + progress * 100);
       const map = Array.from({ length: 8 }, () => Array(width).fill(0));
-      const difficulty = level <= 10 ? 'easy' : level <= 20 ? 'medium' : 'hard';
-      const safeColumns = 5;
-      const platforms = [];
-      const hiddenSpecialPositions = [];
-      const aerialSpecialPositions = [];
-      const gapSpecialPositions = [];
-      const gapColumns = new Set();
-      const surfaceRow = 6;
-      const lowestFloatingBlockRow = surfaceRow - 2;
+      const mapHeight = map.length;
+      const safeColumns = 6;
+      const initialEnd = Math.floor(width * 0.25);
+      const middleEnd = Math.floor(width * 0.75);
+      const finalStart = Math.floor(width * 0.9);
+      const barColumn = Math.max(finalStart + 2, width - 8);
+      const minGroundHeight = 2;
+      const maxGroundHeight = 5;
+      const groundHeights = Array(width).fill(minGroundHeight);
+      const usedSpecialColumns = new Set();
+      let seed = level * 92821 + 1337;
+      let lastEnemyColumn = -999;
 
-      function fillGroundColumn(column) {
+      function random() {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return seed / 4294967296;
+      }
+
+      function pick(items) {
+        return items[Math.floor(random() * items.length)];
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function getSurfaceRow(column) {
+        return mapHeight - groundHeights[column];
+      }
+
+      function fillGroundColumn(column, height = groundHeights[column]) {
         if (column < 0 || column >= width) {
           return;
         }
 
-        for (let row = 0; row < map.length; row += 1) {
-          if (row < surfaceRow && map[row][column] !== 5) {
-            map[row][column] = 0;
-          } else if (row === surfaceRow) {
-            map[row][column] = 1;
-          } else if (row > surfaceRow) {
-            map[row][column] = 2;
-          }
+        groundHeights[column] = clamp(height, minGroundHeight, maxGroundHeight);
+        const surfaceRow = getSurfaceRow(column);
+
+        for (let row = 0; row < mapHeight; row += 1) {
+          map[row][column] = row < surfaceRow ? 0 : row === surfaceRow ? 1 : 2;
         }
-
-        gapColumns.delete(column);
       }
 
-      for (let column = 0; column < width; column += 1) {
-        fillGroundColumn(column);
-      }
-
-      function clearColumn(column) {
-        if (column < safeColumns || column > width - 13) {
+      function clearAirColumn(column) {
+        if (column < 0 || column >= width) {
           return;
         }
 
-        for (let row = 0; row < map.length; row += 1) {
+        const surfaceRow = getSurfaceRow(column);
+
+        for (let row = 0; row < surfaceRow; row += 1) {
           map[row][column] = 0;
         }
-
-        gapColumns.add(column);
       }
 
-      function clearGap(start, length) {
-        for (let offset = 0; offset < length; offset += 1) {
-          clearColumn(start + offset);
+      function clearFloatingObjects(column) {
+        if (column < 0 || column >= width) {
+          return;
         }
 
-        gapSpecialPositions.push({
-          row: Math.max(1, surfaceRow - 3),
-          column: start + Math.floor(length / 2)
-        });
+        const surfaceRow = getSurfaceRow(column);
+
+        for (let row = 0; row < surfaceRow; row += 1) {
+          map[row][column] = 0;
+        }
       }
 
-      function placeHorizontal(row, start, length, value) {
-        const targetRow = value === 3 ? Math.min(row, lowestFloatingBlockRow) : row;
+      function isInsidePlayable(column) {
+        return column >= safeColumns && column < finalStart;
+      }
 
-        for (let offset = 0; offset < length; offset += 1) {
-          const column = start + offset;
+      function isGroundSafe(column) {
+        return column >= 0 && column < width && map[getSurfaceRow(column)][column] === 1;
+      }
 
-          if (column >= safeColumns && column < width - 3 && !gapColumns.has(column)) {
-            map[targetRow][column] = value;
+      function canPlace(row, column) {
+        return row >= 0 && row < getSurfaceRow(column) && isInsidePlayable(column) && map[row][column] === 0;
+      }
+
+      function placeTile(row, column, value) {
+        if (!canPlace(row, column)) {
+          return false;
+        }
+
+        map[row][column] = value;
+        return true;
+      }
+
+      function canSpawnEnemy(column, minDistance = 8) {
+        return isInsidePlayable(column)
+          && column >= safeColumns + 5
+          && column < finalStart - 5
+          && column - lastEnemyColumn >= minDistance;
+      }
+
+      function markEnemySpawn(column) {
+        lastEnemyColumn = Math.max(lastEnemyColumn, column);
+      }
+
+      function placeGroundEnemy(column, value, minDistance = 8, force = false) {
+        const surfaceRow = getSurfaceRow(column);
+        const enemyRow = surfaceRow - 1;
+
+        if (enemyRow < 0 || (!force && !canSpawnEnemy(column, minDistance))) {
+          return false;
+        }
+
+        if (!isInsidePlayable(column) || !isGroundSafe(column) || map[enemyRow][column] !== 0) {
+          return false;
+        }
+
+        map[enemyRow][column] = value;
+        markEnemySpawn(column);
+        return true;
+      }
+
+      function placePlatformEnemy(platformRow, column, value, minDistance = 8, force = false) {
+        if (!force && !canSpawnEnemy(column, minDistance)) {
+          return false;
+        }
+
+        if (platformRow < 2 || platformRow >= getSurfaceRow(column) - 1 || !isInsidePlayable(column)) {
+          return false;
+        }
+
+        if (map[platformRow][column] !== 3 && map[platformRow][column] !== 10) {
+          return false;
+        }
+
+        for (let row = platformRow - 1; row >= Math.max(platformRow - 3, 0); row -= 1) {
+          if (map[row][column] !== 0) {
+            return false;
           }
         }
+
+        map[platformRow - 1][column] = value;
+        markEnemySpawn(column);
+        return true;
       }
 
       function placeCoins(row, start, length) {
         for (let offset = 0; offset < length; offset += 1) {
           const column = start + offset;
 
-          if (column >= safeColumns && column < width - 3 && !gapColumns.has(column) && map[row][column] === 0) {
+          if (canPlace(row, column)) {
             map[row][column] = 4;
           }
         }
       }
 
-      function placeReachablePlatform(row, start, length) {
-        const platformRow = Math.min(Math.max(row, 3), lowestFloatingBlockRow);
+      function placeBrickRow(row, start, length, prizeEvery = 0) {
+        for (let offset = 0; offset < length; offset += 1) {
+          const column = start + offset;
 
-        placeHorizontal(platformRow, start, length, 3);
-        platforms.push({ row: platformRow, start, length });
+          if (!canPlace(row, column)) {
+            continue;
+          }
 
-        if (platformRow <= 3) {
-          const stepStart = Math.max(start - 2, safeColumns);
-          placeHorizontal(4, stepStart, 2, 3);
-          platforms.push({ row: 4, start: stepStart, length: 2 });
+          map[row][column] = prizeEvery > 0 && offset % prizeEvery === prizeEvery - 1 ? 10 : 3;
         }
-
-        placeCoins(Math.max(platformRow - 1, 0), start, length);
       }
 
-      function placePlatformSegment(row, start, length) {
-        const platformRow = Math.min(row, lowestFloatingBlockRow);
-
-        if (platformRow < 1) {
+      function setHeightSmoothly(column, targetHeight) {
+        if (column < 0 || column >= finalStart) {
           return;
         }
 
-        placeHorizontal(platformRow, start, length, 3);
-        platforms.push({ row: platformRow, start, length });
-        placeCoins(Math.max(platformRow - 1, 0), start, length);
+        const previousHeight = column > 0 ? groundHeights[column - 1] : minGroundHeight;
+        const nextHeight = clamp(targetHeight, previousHeight - 1, previousHeight + 1);
+        fillGroundColumn(column, nextHeight);
       }
 
-      function placeTower(start) {
-        const steps = [
-          { row: 4, start, length: 2 },
-          { row: 3, start: start + 3, length: 2 },
-          { row: 1, start: start + 6, length: 2 }
-        ];
+      function placeSpecialCoin(row, column) {
+        for (let radius = 0; radius <= 10; radius += 1) {
+          for (let direction = -1; direction <= 1; direction += 2) {
+            const candidateColumn = column + radius * direction;
 
-        for (const step of steps) {
-          if (step.start >= width - 14) {
-            continue;
+            if (!isInsidePlayable(candidateColumn) || candidateColumn >= finalStart - 3 || usedSpecialColumns.has(candidateColumn)) {
+              continue;
+            }
+
+            for (let rowOffset = 0; rowOffset <= 3; rowOffset += 1) {
+              const candidateRow = Math.min(Math.max(row + rowOffset, 0), getSurfaceRow(candidateColumn) - 2);
+
+              if (map[candidateRow][candidateColumn] === 0 || map[candidateRow][candidateColumn] === 4) {
+                map[candidateRow][candidateColumn] = 6;
+                usedSpecialColumns.add(candidateColumn);
+                return true;
+              }
+            }
+          }
+        }
+
+        return false;
+      }
+
+      function removeEnemiesFromColumnRange(start, end) {
+        for (let column = Math.max(0, start); column <= Math.min(width - 1, end); column += 1) {
+          for (let row = 0; row < getSurfaceRow(column); row += 1) {
+            if (map[row][column] === 7 || map[row][column] === 8 || map[row][column] === 9) {
+              map[row][column] = 0;
+            }
+          }
+        }
+      }
+
+      function buildRollingTerrain() {
+        let currentGroundHeight = minGroundHeight;
+        let direction = 1;
+        let segmentRemaining = 6;
+
+        for (let column = 0; column < finalStart; column += 1) {
+          if (column < safeColumns) {
+            currentGroundHeight = minGroundHeight;
+          } else if (segmentRemaining <= 0) {
+            const phaseColumn = column / finalStart;
+            const holdChance = phaseColumn < 0.25 ? 0.45 : phaseColumn < 0.75 ? 0.28 : 0.18;
+
+            direction = random() < holdChance ? 0 : pick([-1, 1]);
+            segmentRemaining = 3 + Math.floor(random() * (phaseColumn < 0.75 ? 6 : 4));
           }
 
-          placeHorizontal(step.row, step.start, step.length, 3);
-          platforms.push(step);
-          placeCoins(Math.max(step.row - 1, 0), step.start, step.length);
-        }
+          if (column >= safeColumns) {
+            currentGroundHeight = clamp(currentGroundHeight + direction, minGroundHeight, maxGroundHeight);
 
-        const topColumn = Math.min(start + 6, width - 14);
-        hiddenSpecialPositions.push({ row: 0, column: topColumn });
+            if (currentGroundHeight === minGroundHeight) {
+              direction = random() < 0.35 ? 0 : 1;
+            } else if (currentGroundHeight === maxGroundHeight) {
+              direction = random() < 0.35 ? 0 : -1;
+            }
 
-        if (topColumn + 2 < width - 14 && !gapColumns.has(topColumn + 1) && !gapColumns.has(topColumn + 2)) {
-          map[0][topColumn + 1] = 4;
-          map[0][topColumn + 2] = 4;
-        }
-      }
-
-      function placeAirRoad(start, variant) {
-        const segments = [
-          { row: 4, start, length: 3 + (variant % 2) },
-          { row: 4, start: start + 4, length: 4 },
-          { row: 3, start: start + 8, length: 5 + (variant % 3) },
-          { row: 2, start: start + 14, length: 4 },
-          { row: 1, start: start + 18, length: 3 + (variant % 2) }
-        ];
-
-        for (const segment of segments) {
-          if (segment.start >= width - 14) {
-            continue;
+            segmentRemaining -= 1;
           }
 
-          placePlatformSegment(segment.row, segment.start, segment.length);
-        }
-
-        const topSegment = segments[segments.length - 1];
-        const specialColumn = Math.min(topSegment.start + Math.floor(topSegment.length / 2), width - 14);
-        aerialSpecialPositions.push({ row: 0, column: specialColumn });
-
-        if (specialColumn + 2 < width - 14 && !gapColumns.has(specialColumn + 1) && !gapColumns.has(specialColumn + 2)) {
-          map[0][specialColumn + 1] = 4;
-          map[0][specialColumn + 2] = 4;
+          setHeightSmoothly(column, currentGroundHeight);
         }
       }
 
-      const enemyMinSpacing = 8;
-      const enemySpawnColumns = [];
+      function buildStair(start, peakHeight, sideLength) {
+        const baseHeight = groundHeights[Math.max(start - 1, 0)];
+        const climbLength = Math.max(2, sideLength);
+        const totalLength = climbLength * 2 + 1;
 
-      function isFarEnoughFromEnemies(column) {
-        return enemySpawnColumns.every((enemyColumn) => Math.abs(enemyColumn - column) >= enemyMinSpacing);
+        for (let offset = 0; offset < totalLength && start + offset < finalStart - 2; offset += 1) {
+          const column = start + offset;
+          const distanceFromPeak = Math.abs(offset - climbLength);
+          const targetHeight = clamp(peakHeight - distanceFromPeak, minGroundHeight, maxGroundHeight);
+          const blendedHeight = Math.max(targetHeight, Math.min(maxGroundHeight, baseHeight + Math.min(offset + 1, totalLength - offset)));
+          setHeightSmoothly(column, blendedHeight);
+        }
+
+        return start + climbLength;
       }
 
-      function placeEnemyMarker(row, column, value) {
-        if (row < 0 || row >= map.length || column < safeColumns || column >= width - 14) {
-          return false;
+      function addGeometricStairs() {
+        const stairCount = 5 + Math.floor(progress * 8);
+
+        for (let index = 0; index < stairCount; index += 1) {
+          const phaseStart = index % 3 === 0 ? initialEnd : index % 3 === 1 ? middleEnd - Math.floor(width * 0.25) : middleEnd;
+          const phaseSpan = index % 3 === 0 ? initialEnd - safeColumns : Math.floor(width * 0.28);
+          const start = clamp(phaseStart + Math.floor(random() * Math.max(8, phaseSpan)), safeColumns + 10, finalStart - 16);
+          const peakHeight = clamp(3 + Math.floor(random() * (index < 2 ? 2 : 3)), 3, maxGroundHeight);
+          const sideLength = 2 + Math.floor(random() * 3);
+          buildStair(start, peakHeight, sideLength);
+        }
+      }
+
+      function normalizeGroundHeights() {
+        for (let column = 1; column < finalStart; column += 1) {
+          groundHeights[column] = clamp(
+            groundHeights[column],
+            groundHeights[column - 1] - 1,
+            groundHeights[column - 1] + 1
+          );
         }
 
-        if (!isFarEnoughFromEnemies(column)) {
-          return false;
+        groundHeights[finalStart - 1] = minGroundHeight;
+
+        for (let column = finalStart - 2; column >= 0; column -= 1) {
+          groundHeights[column] = clamp(
+            groundHeights[column],
+            groundHeights[column + 1] - 1,
+            groundHeights[column + 1] + 1
+          );
         }
 
-        if (map[row][column] === 5 || map[row][column] === 6 || map[row][column] === 7 || map[row][column] === 8 || map[row][column] === 9) {
+        for (let column = 1; column < finalStart; column += 1) {
+          groundHeights[column] = clamp(
+            groundHeights[column],
+            groundHeights[column - 1] - 1,
+            groundHeights[column - 1] + 1
+          );
+        }
+      }
+
+      function rebuildTerrainFromHeights() {
+        for (let column = 0; column < width; column += 1) {
+          if (column >= finalStart) {
+            groundHeights[column] = minGroundHeight;
+          }
+
+          fillGroundColumn(column, groundHeights[column]);
+        }
+      }
+
+      function findPeaks() {
+        const peaks = [];
+
+        for (let column = safeColumns + 4; column < finalStart - 4; column += 1) {
+          const height = groundHeights[column];
+          const left = groundHeights[column - 1];
+          const right = groundHeights[column + 1];
+
+          if (height >= 4 && height >= left && height >= right && (height > left || height > right)) {
+            peaks.push(column);
+          }
+        }
+
+        return peaks;
+      }
+
+      function findValleys() {
+        const valleys = [];
+
+        for (let column = safeColumns + 5; column < finalStart - 5; column += 1) {
+          const height = groundHeights[column];
+          const wasDescending = groundHeights[column - 2] > groundHeights[column - 1] && groundHeights[column - 1] >= height;
+          const recoveryAhead = groundHeights[column + 1] >= height && groundHeights[column + 2] > height;
+
+          if (height <= 3 && wasDescending && recoveryAhead) {
+            valleys.push(column);
+          }
+        }
+
+        return valleys;
+      }
+
+      function addCoinsOnSlopes() {
+        for (let column = safeColumns + 8; column < finalStart - 8; column += 9 + Math.floor(random() * 8)) {
+          const row = getSurfaceRow(column) - 2;
+
+          if (canPlace(row, column)) {
+            map[row][column] = 4;
+          }
+        }
+      }
+
+      function buildAirTerrace(start, length, row) {
+        let valid = true;
+
+        for (let offset = 0; offset < length; offset += 1) {
+          const column = start + offset;
+
+          if (!isInsidePlayable(column) || row >= getSurfaceRow(column) - 1) {
+            valid = false;
+            break;
+          }
+        }
+
+        if (!valid) {
+          return null;
+        }
+
+        placeBrickRow(row, start, length, 4);
+        placeCoins(Math.max(row - 1, 0), start + 1, Math.max(1, length - 2));
+
+        return { start, length, row };
+      }
+
+      function addAirTerraces() {
+        const terraceCount = 2 + Math.floor(progress * 7);
+        const terraces = [];
+
+        for (let index = 0; index < terraceCount; index += 1) {
+          const column = clamp(
+            Math.floor(width * (0.28 + random() * 0.58)),
+            safeColumns + 12,
+            finalStart - 14
+          );
+          const length = 4 + Math.floor(random() * 4);
+          const row = clamp(getSurfaceRow(column) - 3 - Math.floor(random() * 2), 2, 4);
+          const terrace = buildAirTerrace(column, length, row);
+
+          if (terrace) {
+            terraces.push(terrace);
+          }
+        }
+
+        return terraces;
+      }
+
+      function addTacticalEnemies(terraces) {
+        const peaks = findPeaks();
+        const valleys = findValleys();
+        const guardianStep = Math.max(2, Math.floor(5 - progress * 2));
+        const ambushStep = Math.max(2, Math.floor(5 - progress * 2));
+
+        for (let index = 0; index < peaks.length; index += guardianStep) {
+          const column = peaks[index];
+          const guardian = level >= 10 && random() < 0.45 + progress * 0.35 ? 9 : 8;
+          placeGroundEnemy(column, guardian, 8);
+        }
+
+        for (let index = 0; index < valleys.length; index += ambushStep) {
+          const column = valleys[index] + 1;
+          placeGroundEnemy(column, 7, 8);
+        }
+
+        terraces.forEach((terrace, index) => {
+          const patrolColumn = terrace.start + Math.floor(terrace.length / 2);
+          const enemyType = index % 3 === 0 && level >= 10 ? 9 : 7;
+          placePlatformEnemy(terrace.row, patrolColumn, enemyType, 8);
+        });
+      }
+
+      function placeMandatorySpecialCoins(terraces) {
+        const firstColumn = clamp(Math.floor(width * 0.16), safeColumns + 8, initialEnd - 4);
+        const firstRow = getSurfaceRow(firstColumn) - 2;
+        placeSpecialCoin(firstRow, firstColumn);
+
+        const middleTerrace = terraces.find((terrace) => terrace.start > initialEnd && terrace.start < middleEnd);
+        if (middleTerrace) {
+          placeSpecialCoin(Math.max(0, middleTerrace.row - 2), middleTerrace.start + Math.floor(middleTerrace.length / 2));
+        } else {
+          const middleColumn = clamp(Math.floor(width * 0.52), initialEnd + 4, middleEnd - 6);
+          placeSpecialCoin(getSurfaceRow(middleColumn) - 3, middleColumn);
+        }
+
+        const advancedTerrace = [...terraces].reverse().find((terrace) => terrace.start > middleEnd && terrace.start < finalStart - 8);
+        if (advancedTerrace) {
+          placeSpecialCoin(Math.max(0, advancedTerrace.row - 2), advancedTerrace.start + Math.floor(advancedTerrace.length / 2));
+        } else {
+          const advancedColumn = clamp(Math.floor(width * 0.83), middleEnd + 4, finalStart - 8);
+          placeSpecialCoin(getSurfaceRow(advancedColumn) - 4, advancedColumn);
+        }
+
+        while (usedSpecialColumns.size < 3) {
+          const fallbackColumn = clamp(safeColumns + 12 + usedSpecialColumns.size * Math.floor(finalStart / 4), safeColumns + 8, finalStart - 8);
+          placeSpecialCoin(getSurfaceRow(fallbackColumn) - 3, fallbackColumn);
+        }
+      }
+
+      buildRollingTerrain();
+      addGeometricStairs();
+      normalizeGroundHeights();
+      rebuildTerrainFromHeights();
+
+      for (let column = 0; column < safeColumns; column += 1) {
+        fillGroundColumn(column, minGroundHeight);
+        clearAirColumn(column);
+      }
+
+      for (let column = finalStart; column < width; column += 1) {
+        fillGroundColumn(column, minGroundHeight);
+        clearAirColumn(column);
+      }
+
+      const terraces = addAirTerraces();
+      addCoinsOnSlopes();
+      addTacticalEnemies(terraces);
+      placeMandatorySpecialCoins(terraces);
+
+      if (!map.some((row) => row.includes(10))) {
+        const prizeColumn = clamp(Math.floor(width * 0.45), safeColumns + 8, finalStart - 8);
+        const prizeRow = clamp(getSurfaceRow(prizeColumn) - 3, 2, getSurfaceRow(prizeColumn) - 2);
+        placeTile(prizeRow, prizeColumn, 10);
+      }
+
+      for (let column = finalStart; column < width; column += 1) {
+        fillGroundColumn(column, minGroundHeight);
+        clearAirColumn(column);
+      }
+
+      removeEnemiesFromColumnRange(finalStart - 2, width - 1);
+      map[5][barColumn] = 5;
+
+      return map;
+    }
+
+    function generateLevelStructure(levelNumber) {
+      const level = Math.min(Math.max(levelNumber, 1), totalLevels);
+      const progress = totalLevels <= 1 ? 0 : (level - 1) / (totalLevels - 1);
+      const width = Math.round(250 + progress * 70);
+      const map = Array.from({ length: 8 }, () => Array(width).fill(0));
+      const mapHeight = map.length;
+      const introEnd = Math.floor(width * 0.15);
+      const developmentEnd = Math.floor(width * 0.5);
+      const climaxEnd = Math.floor(width * 0.9);
+      const finalStart = climaxEnd;
+      const barColumn = Math.max(finalStart + 2, width - 8);
+      const minGroundHeight = 2;
+      const maxGroundHeight = 5;
+      const groundHeights = Array(width).fill(null);
+      const gapZones = [];
+      const airPlatforms = [];
+      const usedSpecialColumns = new Set();
+      let currentGroundHeight = minGroundHeight;
+      let seed = level * 92821 + 1337;
+      let lastEnemyColumn = -999;
+
+      function random() {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return seed / 4294967296;
+      }
+
+      function pick(items) {
+        return items[Math.floor(random() * items.length)];
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function getSurfaceRow(column) {
+        return groundHeights[column] === null ? null : mapHeight - groundHeights[column];
+      }
+
+      function setGroundHeight(column, targetHeight) {
+        if (column < 0 || column >= finalStart) {
+          return;
+        }
+
+        const previousHeight = column > 0 && groundHeights[column - 1] !== null
+          ? groundHeights[column - 1]
+          : currentGroundHeight;
+        currentGroundHeight = clamp(
+          clamp(targetHeight, previousHeight - 1, previousHeight + 1),
+          minGroundHeight,
+          maxGroundHeight
+        );
+        groundHeights[column] = currentGroundHeight;
+      }
+
+      function clearColumn(column) {
+        if (column < 0 || column >= width) {
+          return;
+        }
+
+        groundHeights[column] = null;
+
+        for (let row = 0; row < mapHeight; row += 1) {
+          map[row][column] = 0;
+        }
+      }
+
+      function fillGroundColumn(column, height = groundHeights[column]) {
+        if (column < 0 || column >= width || height === null) {
+          return;
+        }
+
+        groundHeights[column] = clamp(height, minGroundHeight, maxGroundHeight);
+        const surfaceRow = getSurfaceRow(column);
+
+        for (let row = 0; row < mapHeight; row += 1) {
+          map[row][column] = row < surfaceRow ? 0 : row === surfaceRow ? 1 : 2;
+        }
+      }
+
+      function clearAirColumn(column) {
+        const surfaceRow = getSurfaceRow(column);
+
+        if (surfaceRow === null) {
+          return;
+        }
+
+        for (let row = 0; row < surfaceRow; row += 1) {
+          map[row][column] = 0;
+        }
+      }
+
+      function canPlace(row, column) {
+        const surfaceRow = getSurfaceRow(column);
+        return column >= 0
+          && column < finalStart
+          && surfaceRow !== null
+          && row >= 0
+          && row < surfaceRow
+          && map[row][column] === 0;
+      }
+
+      function placeTile(row, column, value) {
+        if (!canPlace(row, column)) {
           return false;
         }
 
         map[row][column] = value;
-        enemySpawnColumns.push(column);
         return true;
       }
 
-      function findEnemyColumn(preferredColumn, row, hasSupport) {
-        const minColumn = safeColumns + 6;
-        const maxColumn = width - 15;
-
-        for (let radius = 0; radius <= 18; radius += 1) {
-          const candidates = radius === 0
-            ? [preferredColumn]
-            : [preferredColumn - radius, preferredColumn + radius];
-
-          for (const candidate of candidates) {
-            const column = Math.min(Math.max(candidate, minColumn), maxColumn);
-
-            if (hasSupport(column) && isFarEnoughFromEnemies(column)) {
-              return column;
-            }
-          }
-        }
-
-        return null;
-      }
-
-      if (level >= 5) {
-        const gapCount = level < 10
-          ? 3 + Math.floor(level / 2)
-          : level < 20
-            ? 8 + Math.floor(level * 0.65)
-            : 18 + Math.floor((level - 20) * 1.35);
-        const gapMaxWidth = level < 10 ? 2 : 3;
-        const spacing = Math.max(6, Math.floor((width - 26) / Math.max(gapCount, 1)));
-
-        for (let index = 0; index < gapCount; index += 1) {
-          const start = safeColumns + 7 + index * spacing + ((level + index * 3) % 3);
-          const gapWidth = level < 10 ? 1 + (index % gapMaxWidth) : 2 + ((level + index) % (gapMaxWidth - 1));
-
-          clearGap(start, gapWidth);
-        }
-      }
-
-      const platformCount = level < 5
-        ? 3 + Math.floor(level / 3)
-        : level < 10
-          ? 8 + Math.floor(level / 2)
-          : level < 20
-            ? 15 + Math.floor(level * 0.45)
-            : 26 + Math.floor((level - 20) * 0.9);
-
-      for (let index = 0; index < platformCount; index += 1) {
-        const start = safeColumns + 6 + index * Math.max(5, Math.floor(width / (platformCount + 2)));
-        const platformLength = level < 5 ? 3 : level < 10 ? 3 + (index % 3) : 4 + (index % 4);
-        const row = level < 5 ? 4 : 2 + ((index + level) % 4);
-
-        placeReachablePlatform(row, start, platformLength);
-      }
-
-      if (level >= 5) {
-        const towerCount = Math.min(6, 2 + Math.floor((level - 5) / 5));
-        const towerSpacing = Math.max(14, Math.floor((width - 30) / (towerCount + 1)));
-
-        for (let index = 0; index < towerCount; index += 1) {
-          placeTower(safeColumns + 8 + towerSpacing * index + ((level + index) % 4));
-        }
-
-        const airRoadCount = level < 10 ? 2 : level < 20 ? 4 : 6;
-        const airRoadSpacing = Math.max(18, Math.floor((width - 36) / (airRoadCount + 1)));
-
-        for (let index = 0; index < airRoadCount; index += 1) {
-          placeAirRoad(safeColumns + 8 + airRoadSpacing * index + ((level + index * 2) % 5), index + level);
-        }
-      }
-
-      if (difficulty === 'hard') {
-        const wallCount = 4 + Math.floor((level - 21) / 2);
-        const spacing = Math.max(14, Math.floor(width / (wallCount + 2)));
-
-        for (let index = 0; index < wallCount; index += 1) {
-          const column = safeColumns + 12 + index * spacing;
-
-          if (column >= width - 8 || gapColumns.has(column)) {
-            continue;
-          }
-
-          map[4][column] = 3;
-          map[3][column] = index % 2 === 0 ? 3 : 0;
-          map[2][column] = index % 2 === 0 ? 0 : 3;
-        }
-      }
-
-      const coinStep = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 8;
-
-      for (let column = safeColumns + 3; column < width - 5; column += coinStep) {
-        const row = difficulty === 'easy' ? 5 : column % 2 === 0 ? 4 : 3;
-
-        if (!gapColumns.has(column) && map[row][column] === 0) {
-          map[row][column] = 4;
-        }
-      }
-
-      const enemyCount = level < 5
-        ? 1 + Math.floor(level / 5)
-        : level < 10
-          ? 6 + Math.floor(level * 0.8)
-          : level < 20
-            ? 14 + Math.floor(level * 0.85)
-            : 28 + Math.floor((level - 20) * 1.5);
-      const enemySpacing = Math.max(enemyMinSpacing, Math.floor((width - 24) / Math.max(enemyCount, 1)));
-
-      for (let index = 0; index < enemyCount; index += 1) {
-        const platform = platforms.length > 0 ? platforms[index % platforms.length] : null;
-        const usePlatform = platform && (level >= 5 || index % 2 === 1);
-        const preferredColumn = usePlatform
-          ? Math.min(platform.start + Math.floor(platform.length / 2), width - 14)
-          : safeColumns + 8 + index * enemySpacing + ((level + index * 2) % 5);
-        const markerRow = usePlatform ? platform.row - 1 : 5;
-
-        if (markerRow < 0) {
-          continue;
-        }
-
-        const column = findEnemyColumn(preferredColumn, markerRow, (candidateColumn) => {
-          if (usePlatform) {
-            const platformEnd = platform.start + platform.length - 1;
-            return candidateColumn >= platform.start &&
-              candidateColumn <= platformEnd &&
-              map[platform.row][candidateColumn] === 3;
-          }
-
-          return map[surfaceRow][candidateColumn] !== 0;
-        });
-
-        if (column === null) {
-          continue;
-        }
-
-        const type = difficulty === 'easy' && index < 2 ? 8 : index % 3 === 0 ? 8 : 7;
-        placeEnemyMarker(markerRow, column, type);
-      }
-
-      if (level >= 10) {
-        const shooterCount = level < 20 ? 3 + Math.floor((level - 10) / 2) : 8 + Math.floor((level - 20) * 0.6);
-        const shooterSpacing = Math.max(enemyMinSpacing, Math.floor((width - 34) / shooterCount));
-
-        for (let index = 0; index < shooterCount; index += 1) {
-          const groundColumn = safeColumns + 16 + index * shooterSpacing + ((level + index) % 6);
-
-          const shooterGroundColumn = findEnemyColumn(groundColumn, 5, (candidateColumn) => map[surfaceRow][candidateColumn] !== 0);
-
-          if (shooterGroundColumn !== null) {
-            placeEnemyMarker(5, shooterGroundColumn, 9);
-          }
-
-          if (index % 2 === 0) {
-            const platformColumn = Math.min(groundColumn + 5, width - 16);
-            if (!gapColumns.has(platformColumn)) {
-              map[4][platformColumn] = 3;
-            }
-            const shooterPlatformColumn = findEnemyColumn(platformColumn, 3, (candidateColumn) => (
-              candidateColumn === platformColumn && map[4][candidateColumn] === 3
-            ));
-
-            if (shooterPlatformColumn !== null && (map[3][shooterPlatformColumn] === 0 || map[3][shooterPlatformColumn] === 4)) {
-              placeEnemyMarker(3, shooterPlatformColumn, 9);
-            }
-          }
-        }
-      }
-
-      const specialPositions = [
-        Math.floor(width * 0.28),
-        Math.floor(width * 0.52),
-        Math.floor(width * 0.78)
-      ];
-      const usedRewardPositionKeys = new Set();
-      const rewardPositions = [
-        ...aerialSpecialPositions,
-        ...hiddenSpecialPositions,
-        ...gapSpecialPositions
-      ].filter((position) => {
-        const key = `${position.row}-${position.column}`;
-        const valid = position.column >= safeColumns + 4 &&
-          position.column < width - 14 &&
-          position.row >= 0 &&
-          position.row < map.length &&
-          !usedRewardPositionKeys.has(key);
-
-        if (valid) {
-          usedRewardPositionKeys.add(key);
-        }
-
-        return valid;
-      });
-
-      specialPositions.forEach((column, index) => {
-        if (rewardPositions[index]) {
-          map[rewardPositions[index].row][rewardPositions[index].column] = 6;
-          return;
-        }
-
-        const clampedColumn = Math.min(Math.max(column, safeColumns + 4), width - 14);
-        const row = difficulty === 'easy' ? 3 + (index % 2) : difficulty === 'medium' ? 2 + (index % 2) : 1 + (index % 3);
-
-        map[row][clampedColumn] = 6;
-      });
-
-      function isEnemyTile(value) {
-        return value === 7 || value === 8 || value === 9;
-      }
-
-      function removeUnsafeEnemy(row, column) {
-        if (!isEnemyTile(map[row]?.[column])) {
-          return;
-        }
-
-        map[row][column] = 0;
-      }
-
-      function getBrickPlatformRun(row, column) {
-        if (!map[row] || map[row][column] !== 3) {
-          return null;
-        }
-
-        let start = column;
-        let end = column;
-
-        while (start > 0 && map[row][start - 1] === 3) {
-          start -= 1;
-        }
-
-        while (end < width - 1 && map[row][end + 1] === 3) {
-          end += 1;
-        }
-
-        return {
-          start,
-          end,
-          length: end - start + 1
-        };
-      }
-
-      function hasSafeEnemyHeadroom(enemyRow, column) {
-        const requiredAirBlocks = 3;
-
-        if (enemyRow < requiredAirBlocks) {
+      function placeFloatingTile(row, column, value) {
+        if (column < 0 || column >= finalStart || row < 0 || row >= mapHeight || map[row][column] !== 0) {
           return false;
         }
 
-        for (let row = enemyRow - requiredAirBlocks; row < enemyRow; row += 1) {
+        map[row][column] = value;
+        return true;
+      }
+
+      function placeBrickRow(row, start, length, prizeEvery = 0) {
+        for (let offset = 0; offset < length; offset += 1) {
+          const value = prizeEvery > 0 && offset % prizeEvery === prizeEvery - 1 ? 10 : 3;
+          placeFloatingTile(row, start + offset, value);
+        }
+      }
+
+      function canSpawnEnemy(column, minDistance = 8) {
+        return column >= 6
+          && column < finalStart - 5
+          && column - lastEnemyColumn >= minDistance;
+      }
+
+      function hasStableGroundSupport(column, minWidth = 3) {
+        const height = groundHeights[column];
+
+        if (height === null) {
+          return false;
+        }
+
+        let supportWidth = 1;
+
+        for (let checkColumn = column - 1; checkColumn >= 0 && groundHeights[checkColumn] === height; checkColumn -= 1) {
+          supportWidth += 1;
+        }
+
+        for (let checkColumn = column + 1; checkColumn < finalStart && groundHeights[checkColumn] === height; checkColumn += 1) {
+          supportWidth += 1;
+        }
+
+        return supportWidth >= minWidth;
+      }
+
+      function hasStablePlatformSupport(row, column, minWidth = 3) {
+        if (map[row]?.[column] !== 3 && map[row]?.[column] !== 10) {
+          return false;
+        }
+
+        let supportWidth = 1;
+
+        for (let checkColumn = column - 1; checkColumn >= 0; checkColumn -= 1) {
+          if (map[row][checkColumn] !== 3 && map[row][checkColumn] !== 10) {
+            break;
+          }
+
+          supportWidth += 1;
+        }
+
+        for (let checkColumn = column + 1; checkColumn < finalStart; checkColumn += 1) {
+          if (map[row][checkColumn] !== 3 && map[row][checkColumn] !== 10) {
+            break;
+          }
+
+          supportWidth += 1;
+        }
+
+        return supportWidth >= minWidth;
+      }
+
+      function markEnemySpawn(column) {
+        lastEnemyColumn = Math.max(lastEnemyColumn, column);
+      }
+
+      function placeGroundEnemy(column, value, minDistance = 8, force = false) {
+        const surfaceRow = getSurfaceRow(column);
+
+        if (surfaceRow === null || !hasStableGroundSupport(column) || (!force && !canSpawnEnemy(column, minDistance))) {
+          return false;
+        }
+
+        const enemyRow = surfaceRow - 1;
+
+        if (enemyRow < 0 || map[enemyRow][column] !== 0) {
+          return false;
+        }
+
+        map[enemyRow][column] = value;
+        markEnemySpawn(column);
+        return true;
+      }
+
+      function placePlatformEnemy(platformRow, column, value, minDistance = 8, force = false) {
+        if ((!force && !canSpawnEnemy(column, minDistance)) || column < 0 || column >= finalStart) {
+          return false;
+        }
+
+        if (!hasStablePlatformSupport(platformRow, column)) {
+          return false;
+        }
+
+        for (let row = platformRow - 1; row >= Math.max(platformRow - 3, 0); row -= 1) {
           if (map[row][column] !== 0) {
             return false;
           }
         }
 
+        map[platformRow - 1][column] = value;
+        markEnemySpawn(column);
         return true;
       }
 
-      function clearLandingZoneAfterWideGaps() {
-        let column = safeColumns;
+      function placeCoins(row, start, length) {
+        for (let offset = 0; offset < length; offset += 1) {
+          const column = start + offset;
 
-        while (column < width - 13) {
-          if (map[surfaceRow][column] !== 0) {
-            column += 1;
-            continue;
-          }
-
-          const gapStart = column;
-
-          while (column < width - 13 && map[surfaceRow][column] === 0) {
-            column += 1;
-          }
-
-          const gapWidth = column - gapStart;
-
-          if (gapWidth < 2 || map[surfaceRow][column] !== 1) {
-            continue;
-          }
-
-          for (let landingColumn = column; landingColumn < Math.min(column + 2, width - 13); landingColumn += 1) {
-            for (let row = 0; row < surfaceRow; row += 1) {
-              removeUnsafeEnemy(row, landingColumn);
-            }
+          if (map[row]?.[column] === 0 && column < finalStart) {
+            map[row][column] = 4;
           }
         }
       }
 
-      function applyAccessibilitySafetyChecks() {
-        for (let row = 0; row < surfaceRow; row += 1) {
-          for (let column = safeColumns; column < width - 13; column += 1) {
-            if (!isEnemyTile(map[row][column])) {
+      function placeSpecialCoin(row, column) {
+        for (let radius = 0; radius <= 10; radius += 1) {
+          for (let direction = -1; direction <= 1; direction += 2) {
+            const candidateColumn = column + radius * direction;
+            const surfaceRow = getSurfaceRow(candidateColumn);
+
+            if (candidateColumn < 0 || candidateColumn >= finalStart - 3 || usedSpecialColumns.has(candidateColumn)) {
               continue;
             }
 
-            const supportRow = row + 1;
-            const platform = getBrickPlatformRun(supportRow, column);
+            const maxCoinRow = surfaceRow === null ? mapHeight - 2 : surfaceRow - 2;
 
-            if (!platform) {
-              continue;
-            }
+            for (let rowOffset = 0; rowOffset <= 4; rowOffset += 1) {
+              const candidateRow = clamp(row + rowOffset, 0, maxCoinRow);
 
-            if (platform.length === 1 || !hasSafeEnemyHeadroom(row, column)) {
-              removeUnsafeEnemy(row, column);
+              if (map[candidateRow][candidateColumn] === 0 || map[candidateRow][candidateColumn] === 4) {
+                map[candidateRow][candidateColumn] = 6;
+                usedSpecialColumns.add(candidateColumn);
+                return true;
+              }
             }
           }
         }
 
-        clearLandingZoneAfterWideGaps();
+        return false;
       }
 
-      const barColumn = width - 11;
+      // Ki: introduzione piatta, leggibile e con rischio minimo.
+      function buildIntroTerrain() {
+        for (let column = 0; column < introEnd; column += 1) {
+          currentGroundHeight = minGroundHeight;
+          groundHeights[column] = minGroundHeight;
+        }
+      }
 
-      for (let column = barColumn; column < width; column += 1) {
-        for (let row = 0; row < 6; row += 1) {
-          if (map[row][column] !== 5) {
-            map[row][column] = 0;
+      // Sho: terreno a onde e scale geometriche, sempre con differenza massima di 1 blocco.
+      function buildWaveSection(start, end, localMaxHeight) {
+        let direction = 1;
+        let segmentRemaining = 3 + Math.floor(random() * 5);
+
+        for (let column = start; column < end; column += 1) {
+          if (segmentRemaining <= 0) {
+            direction = pick([-1, 0, 1]);
+            segmentRemaining = 3 + Math.floor(random() * 5);
+          }
+
+          currentGroundHeight = clamp(currentGroundHeight + direction, minGroundHeight, localMaxHeight);
+
+          if (currentGroundHeight === minGroundHeight) {
+            direction = pick([0, 1, 1]);
+          } else if (currentGroundHeight === localMaxHeight) {
+            direction = pick([-1, -1, 0]);
+          }
+
+          setGroundHeight(column, currentGroundHeight);
+          segmentRemaining -= 1;
+        }
+      }
+
+      function buildStair(start, peakHeight, sideLength) {
+        const climbLength = Math.max(2, sideLength);
+        const totalLength = climbLength * 2 + 1;
+
+        for (let offset = 0; offset < totalLength && start + offset < finalStart - 2; offset += 1) {
+          const distanceFromPeak = Math.abs(offset - climbLength);
+          const targetHeight = clamp(peakHeight - distanceFromPeak, minGroundHeight, maxGroundHeight);
+          setGroundHeight(start + offset, targetHeight);
+        }
+
+        return start + totalLength;
+      }
+
+      function buildDevelopmentTerrain() {
+        let cursor = introEnd;
+
+        while (cursor < developmentEnd) {
+          if (random() < 0.44) {
+            cursor = buildStair(cursor, 4 + Math.floor(random() * 2), 2 + Math.floor(random() * 2));
+          } else {
+            const sectionEnd = Math.min(developmentEnd, cursor + 8 + Math.floor(random() * 10));
+            buildWaveSection(cursor, sectionEnd, 4);
+            cursor = sectionEnd;
+          }
+        }
+      }
+
+      // Ten: climax con crepacci e piattaforme, ma senza muri verticali insuperabili.
+      function buildClimaxTerrain() {
+        let cursor = developmentEnd;
+
+        while (cursor < climaxEnd - 4) {
+          const pattern = pick(['wave', 'wave', 'stair', 'gap']);
+
+          if (pattern === 'gap' && cursor < climaxEnd - 12) {
+            const approachEnd = Math.min(cursor + 3, climaxEnd - 8);
+            buildWaveSection(cursor, approachEnd, maxGroundHeight);
+
+            const gapStart = approachEnd;
+            const gapLength = 2 + Math.floor(random() * (2 + Math.floor(progress * 2)));
+
+            for (let column = gapStart; column < gapStart + gapLength; column += 1) {
+              groundHeights[column] = null;
+            }
+
+            gapZones.push({ start: gapStart, length: gapLength });
+            cursor = gapStart + gapLength;
+            currentGroundHeight = clamp(currentGroundHeight - 1, minGroundHeight, maxGroundHeight);
+
+            for (let column = cursor; column < Math.min(cursor + 3, climaxEnd); column += 1) {
+              setGroundHeight(column, currentGroundHeight);
+            }
+
+            cursor += 3;
+          } else if (pattern === 'stair') {
+            cursor = buildStair(cursor, 4 + Math.floor(random() * 2), 3);
+          } else {
+            const sectionEnd = Math.min(climaxEnd, cursor + 7 + Math.floor(random() * 8));
+            buildWaveSection(cursor, sectionEnd, maxGroundHeight);
+            cursor = sectionEnd;
+          }
+        }
+      }
+
+      function normalizeGroundHeights() {
+        for (let column = 1; column < finalStart; column += 1) {
+          if (groundHeights[column] === null || groundHeights[column - 1] === null) {
+            continue;
+          }
+
+          groundHeights[column] = clamp(groundHeights[column], groundHeights[column - 1] - 1, groundHeights[column - 1] + 1);
+        }
+
+        groundHeights[finalStart - 1] = minGroundHeight;
+
+        for (let column = finalStart - 2; column >= 0; column -= 1) {
+          if (groundHeights[column] === null || groundHeights[column + 1] === null) {
+            continue;
+          }
+
+          groundHeights[column] = clamp(groundHeights[column], groundHeights[column + 1] - 1, groundHeights[column + 1] + 1);
+        }
+      }
+
+      function rebuildTerrainFromHeights() {
+        for (let column = 0; column < width; column += 1) {
+          if (column >= finalStart) {
+            fillGroundColumn(column, minGroundHeight);
+          } else if (groundHeights[column] === null) {
+            clearColumn(column);
+          } else {
+            fillGroundColumn(column, groundHeights[column]);
+          }
+        }
+      }
+
+      function findPeaks(start, end) {
+        const peaks = [];
+
+        for (let column = start + 2; column < end - 2; column += 1) {
+          const height = groundHeights[column];
+          const left = groundHeights[column - 1];
+          const right = groundHeights[column + 1];
+
+          if (height !== null && left !== null && right !== null && height >= 4 && height >= left && height >= right && (height > left || height > right)) {
+            peaks.push(column);
           }
         }
 
-        fillGroundColumn(column);
+        return peaks;
       }
 
+      function findValleys(start, end) {
+        const foundValleys = [];
+
+        for (let column = start + 3; column < end - 3; column += 1) {
+          const height = groundHeights[column];
+
+          if (
+            height === minGroundHeight
+            && groundHeights[column - 2] !== null
+            && groundHeights[column + 2] !== null
+            && groundHeights[column - 2] > height
+            && groundHeights[column + 2] > height
+          ) {
+            foundValleys.push(column);
+          }
+        }
+
+        return foundValleys;
+      }
+
+      function buildAirPlatforms() {
+        gapZones.forEach((gap) => {
+          const platformRow = 3;
+          const platformStart = gap.start;
+          const platformLength = Math.max(3, gap.length + 1);
+
+          placeBrickRow(platformRow, platformStart, platformLength, 3);
+          placeCoins(platformRow - 1, platformStart + 1, Math.max(1, platformLength - 2));
+          airPlatforms.push({
+            start: platformStart,
+            length: platformLength,
+            row: platformRow,
+            center: platformStart + Math.floor(platformLength / 2)
+          });
+        });
+      }
+
+      function addRouteCoins() {
+        for (let column = introEnd + 4; column < finalStart - 8; column += 8 + Math.floor(random() * 8)) {
+          const surfaceRow = getSurfaceRow(column);
+
+          if (surfaceRow !== null && canPlace(surfaceRow - 2, column)) {
+            map[surfaceRow - 2][column] = 4;
+          }
+        }
+      }
+
+      function addIntroObjects() {
+        const prizeColumn = Math.floor(introEnd * 0.38);
+        placeTile(4, prizeColumn, 10);
+        placeGroundEnemy(Math.floor(introEnd * 0.72), 7, 1, true);
+      }
+
+      function addTacticalEnemies() {
+        const phase2Peaks = findPeaks(introEnd, developmentEnd);
+        const phase3Peaks = findPeaks(developmentEnd, climaxEnd);
+        const ambushValleys = findValleys(introEnd, climaxEnd);
+
+        phase2Peaks.forEach((column, index) => {
+          if (index % 3 === 0) {
+            placeGroundEnemy(column, 8, 8);
+          }
+        });
+
+        phase3Peaks.forEach((column, index) => {
+          if (index % 2 === 0) {
+            placeGroundEnemy(column, level >= 10 && random() < 0.65 + progress * 0.2 ? 9 : 8, 8);
+          }
+        });
+
+        ambushValleys.forEach((column, index) => {
+          if (index % 3 === 0) {
+            placeGroundEnemy(column, 7, 8);
+          }
+        });
+
+        for (let column = introEnd + 10; column < developmentEnd - 4; column += 24 + Math.floor(random() * 8)) {
+          placeGroundEnemy(column, 7, 8);
+          placeGroundEnemy(column + 2, 7, 0, true);
+        }
+
+        airPlatforms.forEach((platform, index) => {
+          const enemyType = level >= 10 && index % 2 === 0 ? 9 : 7;
+          placePlatformEnemy(platform.row, platform.center, enemyType, 8, true);
+        });
+      }
+
+      function placeMandatorySpecialCoins() {
+        const introCoinColumn = clamp(Math.floor(introEnd * 0.52), 4, introEnd - 4);
+        placeSpecialCoin(3, introCoinColumn);
+
+        const hillColumn = findPeaks(introEnd, developmentEnd)[0] || Math.floor((introEnd + developmentEnd) / 2);
+        placeSpecialCoin(getSurfaceRow(hillColumn) - 2, hillColumn);
+
+        const hiddenPlatform = [...airPlatforms].reverse().find((platform) => platform.center < finalStart - 4);
+        if (hiddenPlatform) {
+          placeSpecialCoin(Math.max(0, hiddenPlatform.row - 2), hiddenPlatform.center);
+        } else {
+          const fallbackColumn = clamp(Math.floor(width * 0.72), developmentEnd + 4, finalStart - 8);
+          placeSpecialCoin(getSurfaceRow(fallbackColumn) - 4, fallbackColumn);
+        }
+
+        while (usedSpecialColumns.size < 3) {
+          const fallbackColumn = clamp(8 + usedSpecialColumns.size * Math.floor(finalStart / 4), 8, finalStart - 8);
+          placeSpecialCoin(getSurfaceRow(fallbackColumn) - 3, fallbackColumn);
+        }
+      }
+
+      function clearFinalZone() {
+        for (let column = finalStart; column < width; column += 1) {
+          fillGroundColumn(column, minGroundHeight);
+          clearAirColumn(column);
+        }
+
+        for (let column = finalStart - 2; column < width; column += 1) {
+          const surfaceRow = getSurfaceRow(column) ?? mapHeight;
+
+          for (let row = 0; row < surfaceRow; row += 1) {
+            if (map[row][column] === 3 || map[row][column] === 4 || map[row][column] === 6 || map[row][column] === 7 || map[row][column] === 8 || map[row][column] === 9 || map[row][column] === 10) {
+              map[row][column] = 0;
+            }
+          }
+        }
+      }
+
+      buildIntroTerrain();
+      buildDevelopmentTerrain();
+      buildClimaxTerrain();
+      normalizeGroundHeights();
+      rebuildTerrainFromHeights();
+      buildAirPlatforms();
+      addIntroObjects();
+      addRouteCoins();
+      placeMandatorySpecialCoins();
+      addTacticalEnemies();
+      clearFinalZone();
       map[5][barColumn] = 5;
-      applyAccessibilitySafetyChecks();
 
       return map;
     }
@@ -1045,11 +2021,11 @@
     }
 
     function updateSpecialCoinUI() {
-      const levelSave = ensureLevelSpecialCoinSave();
-
       specialCoinIcons.forEach((icon, index) => {
-        icon.classList.toggle('collected', levelSave[index] === true);
+        icon.classList.toggle('collected', currentLevelSpecialCoins[index] === true);
       });
+
+      specialCoinCountLabel.textContent = `Monete: ${currentLevelCoinsCollected} / 3`;
     }
 
     function isLevelCompleted(levelIndex) {
@@ -1064,29 +2040,118 @@
       return levelIndex === 0 || isLevelCompleted(levelIndex - 1);
     }
 
-    function updateMenuSpecialCoinUI() {
-      const levelSave = ensureLevelSpecialCoinSave(selectedMenuLevel);
+    const zoneTitles = [
+      "ZONA 1: L'Inizio dell'Avventura",
+      'ZONA 2: I Livelli Avanzati',
+      'ZONA 3: La Sfida Estrema',
+      'ZONA 4: Il Gran Finale'
+    ];
 
-      menuSpecialCoinIcons.forEach((icon, index) => {
-        icon.classList.toggle('collected', levelSave[index] === true);
-      });
+    function getZoneStartLevel(zoneIndex) {
+      return zoneIndex * levelsPerZone;
+    }
+
+    function isZoneUnlocked(zoneIndex) {
+      return zoneIndex === 0 || isLevelCompleted(getZoneStartLevel(zoneIndex) - 1);
+    }
+
+    function getUnlockedLevelsInZone(zoneIndex) {
+      const start = getZoneStartLevel(zoneIndex);
+      let unlockedCount = 0;
+
+      for (let offset = 0; offset < levelsPerZone; offset += 1) {
+        if (isLevelUnlocked(start + offset)) {
+          unlockedCount += 1;
+        }
+      }
+
+      return unlockedCount;
+    }
+
+    function showZoneHub() {
+      zoneHub.classList.add('active');
+      zoneLevels.classList.remove('active');
+      renderZoneHub();
+    }
+
+    function openZone(zoneIndex) {
+      if (!isZoneUnlocked(zoneIndex)) {
+        return;
+      }
+
+      selectedZoneIndex = zoneIndex;
+      selectedZonePage = 0;
+      zoneHub.classList.remove('active');
+      zoneLevels.classList.add('active');
+      updateMainMenu();
+    }
+
+    function renderZoneHub() {
+      zoneGrid.innerHTML = '';
+
+      for (let zoneIndex = 0; zoneIndex < zoneCount; zoneIndex += 1) {
+        const unlocked = isZoneUnlocked(zoneIndex);
+        const zoneCard = document.createElement('button');
+        zoneCard.className = 'zone-card';
+        zoneCard.type = 'button';
+        zoneCard.disabled = !unlocked;
+        zoneCard.innerHTML = `
+          <span class="zone-card-title">ZONA ${zoneIndex + 1}</span>
+          <span class="zone-card-subtitle">Livelli ${getZoneStartLevel(zoneIndex) + 1}-${getZoneStartLevel(zoneIndex) + levelsPerZone}</span>
+          <span class="zone-progress">Livelli sbloccati: ${getUnlockedLevelsInZone(zoneIndex)} / ${levelsPerZone}</span>
+          ${unlocked ? '' : '<span class="level-lock">🔒</span>'}
+        `;
+
+        zoneCard.addEventListener('click', () => openZone(zoneIndex));
+        zoneGrid.appendChild(zoneCard);
+      }
     }
 
     function updateMainMenu() {
-      const unlocked = isLevelUnlocked(selectedMenuLevel);
+      renderZoneHub();
+      const totalZonePages = Math.ceil(levelsPerZone / levelsPerZonePage);
+      const zoneStart = getZoneStartLevel(selectedZoneIndex);
+      const firstLevelIndex = zoneStart + selectedZonePage * levelsPerZonePage;
+      const lastLevelIndex = Math.min(firstLevelIndex + levelsPerZonePage, zoneStart + levelsPerZone);
 
-      menuLevelTitle.textContent = `LIVELLO N. ${selectedMenuLevel + 1}`;
-      prevLevelButton.disabled = selectedMenuLevel === 0;
-      nextLevelButton.disabled = selectedMenuLevel === totalLevels - 1;
-      playButton.disabled = !unlocked;
-      playButton.textContent = unlocked ? 'GIOCA' : 'BLOCCATO';
-      updateMenuSpecialCoinUI();
+      levelGrid.innerHTML = '';
+      selectedZoneTitle.textContent = zoneTitles[selectedZoneIndex];
+      zonePageLabel.textContent = `${selectedZonePage + 1} / ${totalZonePages}`;
+      prevZonePageButton.disabled = selectedZonePage === 0;
+      nextZonePageButton.disabled = selectedZonePage >= totalZonePages - 1;
+
+      for (let levelIndex = firstLevelIndex; levelIndex < lastLevelIndex; levelIndex += 1) {
+        const unlocked = isLevelUnlocked(levelIndex);
+        const levelSave = ensureLevelSpecialCoinSave(levelIndex);
+        const card = document.createElement('button');
+        card.className = 'level-card';
+        card.classList.toggle('locked', !unlocked);
+        card.type = 'button';
+        card.disabled = !unlocked;
+        card.innerHTML = `
+          <span class="level-number">${levelIndex + 1}</span>
+          ${unlocked ? '' : '<span class="level-lock">🔒</span>'}
+          <span class="level-card-coins">
+            ${levelSave.map((collected) => `<img class="${collected ? 'collected' : ''}" src="assets/moneta.png" alt="">`).join('')}
+          </span>
+        `;
+
+        card.addEventListener('click', () => {
+          if (unlocked) {
+            startMenuLevel(levelIndex);
+          }
+        });
+
+        levelGrid.appendChild(card);
+      }
     }
 
     function showMainMenu() {
       mainMenu.style.display = 'flex';
       coinCounter.style.display = 'none';
       document.getElementById('special-coins').style.display = 'none';
+      updatePauseButtonVisibility();
+      showZoneHub();
       updateMainMenu();
     }
 
@@ -1094,10 +2159,11 @@
       mainMenu.style.display = 'none';
       coinCounter.style.display = 'flex';
       document.getElementById('special-coins').style.display = 'flex';
+      updatePauseButtonVisibility();
     }
 
     function getTileTexture(map, tileType, row, column) {
-      if (tileType === 3) {
+      if (tileType === 3 || tileType === 10) {
         return tileTextures.brick;
       }
 
@@ -1134,6 +2200,11 @@
       };
     }
 
+    function createCiapetBounds(x, meshY, width = shooterHitboxWidth, height = shooterHitboxHeight) {
+      const hitboxCenterY = meshY - shooterHeight / 2 + height / 2 + shooterHitboxBasePadding;
+      return createBounds(x, hitboxCenterY, width, height);
+    }
+
     function clearCurrentLevel() {
       for (const mesh of levelObjects) {
         scene.remove(mesh);
@@ -1142,11 +2213,26 @@
       }
 
       levelObjects.length = 0;
+      for (const helper of blockHitboxHelpers) {
+        scene.remove(helper);
+        helper.geometry.dispose();
+        helper.material.dispose();
+      }
+      blockHitboxHelpers.length = 0;
       collidableObjects.length = 0;
       coins.length = 0;
       specialCoins.length = 0;
       enemies.length = 0;
       projectiles.length = 0;
+      for (const particle of dustParticles) {
+        scene.remove(particle.mesh);
+        particle.mesh.geometry.dispose();
+        particle.mesh.material.dispose();
+      }
+      for (const enemy of enemies) {
+        disposeEnemyHitboxDebug(enemy);
+      }
+      dustParticles.length = 0;
       targetBar = null;
     }
 
@@ -1162,14 +2248,14 @@
           const tileTop = getTileCenterY(map, row) + tileSize / 2;
           return {
             x: tileSize / 2,
-            y: tileTop + getPlayerHitboxHeight() / 2
+            y: tileTop + getPlayerHitboxHeight() / 2 - getPlayerPhysicsVerticalOffset()
           };
         }
       }
 
       return {
         x: tileSize / 2,
-        y: levelBottom + getPlayerHitboxHeight() / 2
+        y: levelBottom + getPlayerHitboxHeight() / 2 - getPlayerPhysicsVerticalOffset()
       };
     }
 
@@ -1200,7 +2286,8 @@
     }
 
     function generateLevel(map = getLevelMap(currentLevelIndex)) {
-      const levelSave = ensureLevelSpecialCoinSave();
+      currentLevelCoinsCollected = 0;
+      currentLevelSpecialCoins = [false, false, false];
       let specialCoinIndex = 0;
 
       if (player) {
@@ -1246,13 +2333,8 @@
           }
 
           if (tileType === 6) {
-            const collected = levelSave[specialCoinIndex] === true;
             const currentSpecialCoinIndex = specialCoinIndex;
             specialCoinIndex += 1;
-
-            if (collected) {
-              continue;
-            }
 
             const geometry = new THREE.PlaneGeometry(specialCoinSize, specialCoinSize);
             const material = new THREE.MeshBasicMaterial({
@@ -1320,6 +2402,7 @@
                 right: (platformInfo.end + 1) * tileSize
               } : null,
               currentTextureKey: `idle-${enemyDirection}`,
+              velocityY: 0,
               deathVelocityY: 0,
               bounds: createBounds(x, enemyY, enemyHitboxWidth, enemyHitboxHeight)
             });
@@ -1339,6 +2422,20 @@
             const shooterY = y - tileSize / 2 + shooterHeight / 2 + 0.04;
             shooterMesh.position.set(x, shooterY, 0.3);
             scene.add(trackLevelObject(shooterMesh));
+            const ciapetHitbox = createCiapetBounds(x, shooterY);
+            let ciapetHitboxDebugMesh = null;
+            let ciapetHitboxDebug = null;
+
+            if (SHOW_DEBUG_HITBOXES) {
+              ciapetHitboxDebugMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 0.05),
+                new THREE.MeshBasicMaterial({ visible: false })
+              );
+              ciapetHitboxDebug = new THREE.BoxHelper(ciapetHitboxDebugMesh, 0xff0000);
+              ciapetHitboxDebug.renderOrder = 1001;
+              scene.add(ciapetHitboxDebugMesh);
+              scene.add(ciapetHitboxDebug);
+            }
 
             enemies.push({
               mesh: shooterMesh,
@@ -1353,7 +2450,12 @@
               animationFrame: 0,
               currentTextureKey: 'ciapet-idle',
               deathVelocityY: 0,
-              bounds: createBounds(x, shooterY, shooterHitboxWidth, shooterHitboxHeight)
+              ciapetHitboxWidth: shooterHitboxWidth,
+              ciapetHitboxHeight: shooterHitboxHeight,
+              ciapetHitbox,
+              ciapetHitboxDebugMesh,
+              ciapetHitboxDebug,
+              bounds: ciapetHitbox
             });
             continue;
           }
@@ -1368,10 +2470,23 @@
           tile.position.set(x, y, 0);
           scene.add(trackLevelObject(tile));
 
-          collidableObjects.push({
+          const collidableObject = {
             mesh: tile,
+            type: tileType,
+            used: false,
+            active: true,
             ...createBounds(x, y, tileSize, tileSize)
-          });
+          };
+
+          if (SHOW_DEBUG_HITBOXES) {
+            collidableObject.debugHelper = new THREE.BoxHelper(tile, 0x00ff66);
+            collidableObject.debugHelper.visible = false;
+            collidableObject.debugHelper.renderOrder = 999;
+            scene.add(collidableObject.debugHelper);
+            blockHitboxHelpers.push(collidableObject.debugHelper);
+          }
+
+          collidableObjects.push(collidableObject);
         }
       }
 
@@ -1413,21 +2528,16 @@
     player = new THREE.Mesh(playerGeometry, playerMaterial);
     player.position.set(2.5, -5 + playerSize / 2, 0);
     scene.add(player);
-    const playerHitbox = new THREE.Box2();
-    const playerHitboxGeometry = new THREE.BufferGeometry();
-    const playerHitboxVertices = new Float32Array(12);
-    playerHitboxGeometry.setAttribute('position', new THREE.BufferAttribute(playerHitboxVertices, 3));
-    const playerHitboxDebug = new THREE.LineLoop(
-      playerHitboxGeometry,
-      new THREE.LineBasicMaterial({
-        color: 0xff0000,
-        transparent: true,
-        opacity: 0.65,
-        depthTest: false
-      })
+    const playerPhysicsBox = new THREE.Box2();
+    const playerHitbox = playerPhysicsBox;
+    const playerPhysicsDebugMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 0.05),
+      new THREE.MeshBasicMaterial({ visible: false })
     );
-    playerHitboxDebug.visible = SHOW_DEBUG_HITBOX;
+    const playerHitboxDebug = new THREE.BoxHelper(playerPhysicsDebugMesh, 0xff0000);
+    playerHitboxDebug.visible = SHOW_DEBUG_HITBOXES;
     playerHitboxDebug.renderOrder = 1000;
+    scene.add(playerPhysicsDebugMesh);
     scene.add(playerHitboxDebug);
     updatePlayerVisualScale();
 
@@ -1439,6 +2549,10 @@
     const playerVelocity = new THREE.Vector2(0, 0);
     let isGrounded = true;
     let jumpRequested = false;
+    let mobileInputX = 0;
+    let activeJoystickPointerId = null;
+    const joystickMaxOffset = 40;
+    const joystickDeadZone = 5;
 
     function setMovementKey(code, isPressed) {
       if (code === 'ArrowLeft' || code === 'KeyA') {
@@ -1455,6 +2569,15 @@
     }
 
     function handleKeyDown(event) {
+      if (event.code === 'KeyP' || event.code === 'Escape') {
+        togglePause(event);
+        return;
+      }
+
+      if (isPaused) {
+        return;
+      }
+
       const handledMovement = setMovementKey(event.code, true);
 
       if (event.code === 'Space') {
@@ -1476,48 +2599,215 @@
       }
     }
 
+    function setJoystickOffset(offsetX) {
+      const clampedOffset = Math.max(-joystickMaxOffset, Math.min(joystickMaxOffset, offsetX));
+      joystickHandle.style.transform = `translate(calc(-50% + ${clampedOffset}px), -50%)`;
+      mobileInputX = Math.abs(clampedOffset) < joystickDeadZone ? 0 : clampedOffset / joystickMaxOffset;
+    }
+
+    function resetJoystick() {
+      activeJoystickPointerId = null;
+      setJoystickOffset(0);
+    }
+
+    function updateJoystickFromPointer(event) {
+      event.preventDefault();
+      const baseRect = joystickBase.getBoundingClientRect();
+      const baseCenterX = baseRect.left + baseRect.width / 2;
+      setJoystickOffset(event.clientX - baseCenterX);
+    }
+
+    function handleJoystickPointerDown(event) {
+      event.preventDefault();
+      activeJoystickPointerId = event.pointerId;
+      joystickBase.setPointerCapture(event.pointerId);
+      updateJoystickFromPointer(event);
+    }
+
+    function handleJoystickPointerMove(event) {
+      if (event.pointerId !== activeJoystickPointerId) {
+        return;
+      }
+
+      updateJoystickFromPointer(event);
+    }
+
+    function handleJoystickPointerUp(event) {
+      if (event.pointerId !== activeJoystickPointerId) {
+        return;
+      }
+
+      event.preventDefault();
+      resetJoystick();
+    }
+
+    function handleMobileJump(event) {
+      event.preventDefault();
+
+      if (!isGameStarted || isChangingLevel || isGameCompleted || !isGrounded) {
+        return;
+      }
+
+      spawnJumpDust();
+      playerVelocity.y = jumpVelocity;
+      isGrounded = false;
+      jumpRequested = false;
+    }
+
+    function triggerScreenShake(duration, intensity) {
+      screenShakeDuration = duration;
+      screenShakeTimer = duration;
+      screenShakeIntensity = intensity;
+    }
+
+    function triggerDamageFlash() {
+      damageFlashTimer = 0.1;
+      playerMaterial.color.setHex(0xff0000);
+    }
+
+    function updateDamageFlash(deltaTime) {
+      if (damageFlashTimer <= 0) {
+        return;
+      }
+
+      damageFlashTimer -= deltaTime;
+
+      if (damageFlashTimer <= 0) {
+        playerMaterial.color.setHex(0xffffff);
+      }
+    }
+
+    function createDustParticle(x, y, velocityX, velocityY, size = 0.12) {
+      const geometry = new THREE.PlaneGeometry(size, size);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xd8d8d8,
+        transparent: true,
+        opacity: 0.72,
+        depthWrite: false
+      });
+      const particle = new THREE.Mesh(geometry, material);
+      particle.position.set(x, y, 0.65);
+      scene.add(particle);
+
+      dustParticles.push({
+        mesh: particle,
+        velocityX,
+        velocityY,
+        life: 0.3,
+        maxLife: 0.3
+      });
+    }
+
+    function spawnRunDust() {
+      const footY = playerHitbox.min.y + 0.08;
+      const originX = player.position.x - playerFacingDirection * getPlayerHitboxWidth() * 0.36;
+
+      for (let index = 0; index < 3; index += 1) {
+        createDustParticle(
+          originX - playerFacingDirection * index * 0.08,
+          footY + index * 0.02,
+          -playerFacingDirection * (0.9 + index * 0.22),
+          0.55 + index * 0.12,
+          0.1 + index * 0.025
+        );
+      }
+    }
+
+    function spawnJumpDust() {
+      updatePlayerHitbox();
+      const footY = playerHitbox.min.y + 0.06;
+
+      for (let index = 0; index < 6; index += 1) {
+        const angle = (Math.PI * 2 * index) / 6;
+        createDustParticle(
+          player.position.x + Math.cos(angle) * 0.18,
+          footY,
+          Math.cos(angle) * 1.6,
+          Math.max(0.35, Math.sin(angle) * 0.8),
+          0.14
+        );
+      }
+    }
+
+    function updateDustParticles(deltaTime) {
+      for (let index = dustParticles.length - 1; index >= 0; index -= 1) {
+        const particle = dustParticles[index];
+
+        particle.life -= deltaTime;
+        particle.mesh.position.x += particle.velocityX * deltaTime;
+        particle.mesh.position.y += particle.velocityY * deltaTime;
+        particle.velocityY += gravity * 0.18 * deltaTime;
+
+        const lifeRatio = Math.max(particle.life / particle.maxLife, 0);
+        particle.mesh.material.opacity = 0.72 * lifeRatio;
+        particle.mesh.scale.setScalar(Math.max(lifeRatio, 0.01));
+
+        if (particle.life > 0) {
+          continue;
+        }
+
+        scene.remove(particle.mesh);
+        particle.mesh.geometry.dispose();
+        particle.mesh.material.dispose();
+        dustParticles.splice(index, 1);
+      }
+    }
+
+    function getPlayerVisualWidth() {
+      return playerSize * Math.abs(player.scale.x);
+    }
+
+    function getPlayerVisualHeight() {
+      return playerSize * Math.abs(player.scale.y);
+    }
+
     function getPlayerHitboxWidth() {
-      return playerSize * Math.abs(player.scale.x) * playerHitboxWidthScale;
+      return getPlayerVisualWidth() * 0.6;
     }
 
     function getPlayerHitboxHeight() {
-      return playerSize * Math.abs(player.scale.y) * playerHitboxHeightScale;
+      return getPlayerVisualHeight() * 0.95;
+    }
+
+    function getPlayerPhysicsVerticalOffset() {
+      return getPlayerVisualHeight() * 0.025;
     }
 
     function updatePlayerHitbox() {
       const halfWidth = getPlayerHitboxWidth() / 2;
       const halfHeight = getPlayerHitboxHeight() / 2;
+      const verticalSkinOffset = getPlayerPhysicsVerticalOffset();
 
-      playerHitbox.min.set(player.position.x - halfWidth, player.position.y - halfHeight);
-      playerHitbox.max.set(player.position.x + halfWidth, player.position.y + halfHeight);
+      playerPhysicsBox.min.set(player.position.x - halfWidth, player.position.y + verticalSkinOffset - halfHeight);
+      playerPhysicsBox.max.set(player.position.x + halfWidth, player.position.y + verticalSkinOffset + halfHeight);
       updatePlayerHitboxDebug();
     }
 
     function updatePlayerHitboxDebug() {
-      playerHitboxDebug.visible = SHOW_DEBUG_HITBOX;
+      playerHitboxDebug.visible = SHOW_DEBUG_HITBOXES;
 
-      if (!SHOW_DEBUG_HITBOX) {
+      if (!SHOW_DEBUG_HITBOXES) {
         return;
       }
 
-      const z = 0.7;
-      const vertices = playerHitboxGeometry.attributes.position.array;
-      vertices.set([
-        playerHitbox.min.x, playerHitbox.min.y, z,
-        playerHitbox.max.x, playerHitbox.min.y, z,
-        playerHitbox.max.x, playerHitbox.max.y, z,
-        playerHitbox.min.x, playerHitbox.max.y, z
-      ]);
-      playerHitboxGeometry.attributes.position.needsUpdate = true;
-      playerHitboxGeometry.computeBoundingSphere();
+      const width = playerPhysicsBox.max.x - playerPhysicsBox.min.x;
+      const height = playerPhysicsBox.max.y - playerPhysicsBox.min.y;
+      playerPhysicsDebugMesh.position.set(
+        (playerPhysicsBox.min.x + playerPhysicsBox.max.x) / 2,
+        (playerPhysicsBox.min.y + playerPhysicsBox.max.y) / 2,
+        0.72
+      );
+      playerPhysicsDebugMesh.scale.set(width, height, 1);
+      playerPhysicsDebugMesh.updateMatrixWorld(true);
+      playerHitboxDebug.update();
     }
 
     function getPlayerBoundsFromHitbox() {
       return {
-        left: playerHitbox.min.x,
-        right: playerHitbox.max.x,
-        top: playerHitbox.max.y,
-        bottom: playerHitbox.min.y
+        left: playerPhysicsBox.min.x,
+        right: playerPhysicsBox.max.x,
+        top: playerPhysicsBox.max.y,
+        bottom: playerPhysicsBox.min.y
       };
     }
 
@@ -1526,23 +2816,46 @@
     }
 
     function isBlockUnderPlayerFeet(playerBounds, object) {
-      const horizontalOverlap = playerBounds.right > object.left + 0.04 && playerBounds.left < object.right - 0.04;
-      const playerWasAbove = previousPlayerBottom >= object.top - 0.12;
-      const playerIsAboveCenter = player.position.y >= (object.bottom + object.top) / 2;
+      const footTolerance = 0.08;
+      const horizontalOverlap = playerBounds.right > object.left + 0.05 && playerBounds.left < object.right - 0.05;
+      const blockIsBelowFeet = object.top <= playerBounds.bottom + footTolerance;
 
-      return horizontalOverlap && playerWasAbove && playerIsAboveCenter;
+      return horizontalOverlap && blockIsBelowFeet;
+    }
+
+    function hasGroundSupport() {
+      updatePlayerHitbox();
+      const playerBounds = getPlayerBoundsFromHitbox();
+      const supportY = playerBounds.bottom - 0.06;
+
+      return collidableObjects.some((object) => (
+        object.active &&
+        playerBounds.right > object.left + 0.06 &&
+        playerBounds.left < object.right - 0.06 &&
+        supportY <= object.top &&
+        supportY >= object.top - 0.16
+      ));
     }
 
     function resolveHorizontalCollisions() {
       updatePlayerHitbox();
       const playerBounds = getPlayerBoundsFromHitbox();
+      const footTolerance = 0.08;
 
       for (const object of collidableObjects) {
+        if (!object.active) {
+          continue;
+        }
+
         if (!hasAABBOverlap(playerBounds, object)) {
           continue;
         }
 
         if (isBlockUnderPlayerFeet(playerBounds, object)) {
+          continue;
+        }
+
+        if (object.top <= playerBounds.bottom + footTolerance) {
           continue;
         }
 
@@ -1558,11 +2871,31 @@
       }
     }
 
+    function activatePrizeBlock(object) {
+      if (object.type !== 10 || object.used) {
+        return;
+      }
+
+      object.used = true;
+      object.type = 3;
+      coinCount += 1;
+      updateCoinCounter();
+      object.mesh.material.map = null;
+      object.mesh.material.color.set(0x8f8f8f);
+      object.mesh.material.needsUpdate = true;
+    }
+
     function resolveVerticalCollisions(previousBottom, previousTop) {
       updatePlayerHitbox();
       const playerBounds = getPlayerBoundsFromHitbox();
+      const halfHeight = getPlayerHitboxHeight() / 2;
+      const verticalOffset = getPlayerPhysicsVerticalOffset();
 
       for (const object of collidableObjects) {
+        if (!object.active) {
+          continue;
+        }
+
         if (!hasAABBOverlap(playerBounds, object)) {
           continue;
         }
@@ -1571,7 +2904,7 @@
         const isHeadHit = playerVelocity.y > 0 && previousTop <= object.bottom;
 
         if (isLanding) {
-          player.position.y = object.top + getPlayerHitboxHeight() / 2;
+          player.position.y = object.top + halfHeight - verticalOffset;
           updatePlayerHitbox();
           playerVelocity.y = 0;
           isGrounded = true;
@@ -1579,7 +2912,8 @@
         }
 
         if (isHeadHit) {
-          player.position.y = object.bottom - getPlayerHitboxHeight() / 2;
+          activatePrizeBlock(object);
+          player.position.y = object.bottom - halfHeight - verticalOffset;
           updatePlayerHitbox();
           playerVelocity.y = -0.01;
           return;
@@ -1587,15 +2921,9 @@
       }
     }
 
-    function getVisibleLeftEdge() {
-      return camera.position.x + camera.left;
-    }
-
-    function clampPlayerToCameraLeftEdge() {
-      const minPlayerX = getVisibleLeftEdge() + getPlayerHitboxWidth() / 2;
-
-      if (player.position.x < minPlayerX) {
-        player.position.x = minPlayerX;
+    function clampPlayerToLevelStart() {
+      if (player.position.x < 0) {
+        player.position.x = 0;
         playerVelocity.x = Math.max(playerVelocity.x, 0);
         updatePlayerHitbox();
       }
@@ -1605,16 +2933,105 @@
       coinCountLabel.textContent = coinCount;
     }
 
+    function updatePauseButtonVisibility() {
+      pauseButton.style.display = isGameStarted && !isChangingLevel && !isGameCompleted ? 'block' : 'none';
+    }
+
+    function pauseGame(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      if (!isGameStarted || isChangingLevel || isGameCompleted || isPaused) {
+        return;
+      }
+
+      isPaused = true;
+      playerVelocity.set(0, 0);
+      pauseMenu.style.display = 'flex';
+      updatePauseButtonVisibility();
+    }
+
+    function resumeGame(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      isPaused = false;
+      pauseMenu.style.display = 'none';
+      updatePauseButtonVisibility();
+    }
+
+    function restartFromPause(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      isPaused = false;
+      pauseMenu.style.display = 'none';
+      restartCurrentLevel();
+      updatePauseButtonVisibility();
+    }
+
+    function returnToMainMenuFromPause(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      isPaused = false;
+      pauseMenu.style.display = 'none';
+      clearCurrentLevel();
+      isChangingLevel = false;
+      isGameCompleted = false;
+      isGameStarted = false;
+      playerVelocity.set(0, 0);
+      updatePauseButtonVisibility();
+      showMainMenu();
+    }
+
+    function togglePause(event) {
+      if (isPaused) {
+        resumeGame(event);
+      } else {
+        pauseGame(event);
+      }
+    }
+
     function showLevelMessage(text) {
+      if (levelGateMessageTimer) {
+        clearTimeout(levelGateMessageTimer);
+        levelGateMessageTimer = null;
+      }
+
       levelMessage.textContent = text;
       levelMessage.style.display = 'flex';
     }
 
     function hideLevelMessage() {
+      if (levelGateMessageTimer) {
+        clearTimeout(levelGateMessageTimer);
+        levelGateMessageTimer = null;
+      }
+
       levelMessage.style.display = 'none';
     }
 
+    function showTemporaryLevelMessage(text, duration = 2600) {
+      if (levelGateMessageTimer) {
+        return;
+      }
+
+      showLevelMessage(text);
+      levelGateMessageTimer = setTimeout(() => {
+        hideLevelMessage();
+        levelGateMessageTimer = null;
+      }, duration);
+    }
+
     function showWinMenu() {
+      isPaused = false;
+      pauseMenu.style.display = 'none';
+      updatePauseButtonVisibility();
       winNextButton.disabled = currentLevelIndex >= totalLevels - 1;
       winMenu.style.display = 'flex';
       coinCounter.style.display = 'none';
@@ -1626,9 +3043,12 @@
     }
 
     function showGameOverMenu() {
+      isPaused = false;
+      pauseMenu.style.display = 'none';
       isGameStarted = false;
       isChangingLevel = false;
       playerVelocity.set(0, 0);
+      updatePauseButtonVisibility();
       gameOverMenu.style.display = 'flex';
       coinCounter.style.display = 'none';
       document.getElementById('special-coins').style.display = 'none';
@@ -1656,6 +3076,7 @@
       hideGameOverMenu();
       clearCurrentLevel();
       isGameStarted = true;
+      isPaused = false;
       isChangingLevel = false;
       isGameCompleted = false;
       resetPlayerPosition();
@@ -1672,27 +3093,55 @@
       isChangingLevel = false;
       isGameCompleted = false;
       isGameStarted = false;
+      isPaused = false;
+      updatePauseButtonVisibility();
       showMainMenu();
     }
 
-    function startSelectedLevel() {
-      if (!isLevelUnlocked(selectedMenuLevel)) {
+    function isTouchDevice() {
+      return window.matchMedia('(pointer: coarse)').matches;
+    }
+
+    function isMobilePortrait() {
+      return isTouchDevice() && window.innerHeight > window.innerWidth;
+    }
+
+    function requestLandscapeOrientation() {
+      if (!screen.orientation || !screen.orientation.lock) {
+        return;
+      }
+
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+
+    function startMenuLevel(levelIndex) {
+      if (!isLevelUnlocked(levelIndex)) {
         updateMainMenu();
         return;
       }
 
+      requestLandscapeOrientation();
       clearCurrentLevel();
-      currentLevelIndex = selectedMenuLevel;
+      currentLevelIndex = levelIndex;
+      selectedMenuLevel = levelIndex;
+      selectedZoneIndex = Math.floor(levelIndex / levelsPerZone);
+      selectedZonePage = Math.floor((levelIndex % levelsPerZone) / levelsPerZonePage);
       isGameStarted = true;
+      isPaused = false;
       isChangingLevel = false;
       isGameCompleted = false;
       hideLevelMessage();
       hideGameOverMenu();
       hideMainMenu();
       resetPlayerPosition();
-      generateLevel(getLevelMap(selectedMenuLevel));
+      generateLevel(getLevelMap(levelIndex));
       updateSpecialCoinUI();
       updateCoinCounter();
+      updatePauseButtonVisibility();
+    }
+
+    function startSelectedLevel() {
+      startMenuLevel(selectedMenuLevel);
     }
 
     function restartCurrentLevel() {
@@ -1700,6 +3149,7 @@
       hideGameOverMenu();
       clearCurrentLevel();
       isGameStarted = true;
+      isPaused = false;
       isChangingLevel = false;
       isGameCompleted = false;
       resetPlayerPosition();
@@ -1708,6 +3158,7 @@
       document.getElementById('special-coins').style.display = 'flex';
       updateSpecialCoinUI();
       updateCoinCounter();
+      updatePauseButtonVisibility();
     }
 
     function goToNextLevel() {
@@ -1717,10 +3168,13 @@
 
       currentLevelIndex += 1;
       selectedMenuLevel = currentLevelIndex;
+      selectedZoneIndex = Math.floor(currentLevelIndex / levelsPerZone);
+      selectedZonePage = Math.floor((currentLevelIndex % levelsPerZone) / levelsPerZonePage);
       hideWinMenu();
       hideGameOverMenu();
       clearCurrentLevel();
       isGameStarted = true;
+      isPaused = false;
       isChangingLevel = false;
       isGameCompleted = false;
       resetPlayerPosition();
@@ -1729,15 +3183,20 @@
       document.getElementById('special-coins').style.display = 'flex';
       updateSpecialCoinUI();
       updateCoinCounter();
+      updatePauseButtonVisibility();
     }
 
     function returnToMainMenuFromWin() {
       hideWinMenu();
       clearCurrentLevel();
       selectedMenuLevel = Math.min(currentLevelIndex + 1, totalLevels - 1);
+      selectedZoneIndex = Math.floor(selectedMenuLevel / levelsPerZone);
+      selectedZonePage = Math.floor((selectedMenuLevel % levelsPerZone) / levelsPerZonePage);
       isChangingLevel = false;
       isGameCompleted = false;
       isGameStarted = false;
+      isPaused = false;
+      updatePauseButtonVisibility();
       showMainMenu();
     }
 
@@ -1797,6 +3256,10 @@
         }
 
         specialCoins.splice(index, 1);
+        if (!currentLevelSpecialCoins[specialCoin.index]) {
+          currentLevelSpecialCoins[specialCoin.index] = true;
+          currentLevelCoinsCollected += 1;
+        }
         levelSave[specialCoin.index] = true;
         saveSpecialCoinSaves();
         updateSpecialCoinUI();
@@ -1805,12 +3268,14 @@
 
     function updateEnemyBounds(enemy) {
       if (enemy.type === 'shooter') {
-        enemy.bounds = createBounds(
+        enemy.ciapetHitbox = createCiapetBounds(
           enemy.mesh.position.x,
           enemy.mesh.position.y,
-          shooterHitboxWidth,
-          shooterHitboxHeight
+          enemy.ciapetHitboxWidth,
+          enemy.ciapetHitboxHeight
         );
+        enemy.bounds = enemy.ciapetHitbox;
+        updateCiapetHitboxDebug(enemy);
         return;
       }
 
@@ -1822,8 +3287,48 @@
       );
     }
 
+    function updateCiapetHitboxDebug(enemy) {
+      if (!enemy.ciapetHitboxDebug || !enemy.ciapetHitboxDebugMesh) {
+        return;
+      }
+
+      enemy.ciapetHitboxDebug.visible = SHOW_DEBUG_HITBOXES && enemy.active && !enemy.isDead;
+
+      if (!enemy.ciapetHitboxDebug.visible) {
+        return;
+      }
+
+      const width = enemy.ciapetHitbox.right - enemy.ciapetHitbox.left;
+      const height = enemy.ciapetHitbox.top - enemy.ciapetHitbox.bottom;
+      enemy.ciapetHitboxDebugMesh.position.set(
+        (enemy.ciapetHitbox.left + enemy.ciapetHitbox.right) / 2,
+        (enemy.ciapetHitbox.bottom + enemy.ciapetHitbox.top) / 2,
+        0.78
+      );
+      enemy.ciapetHitboxDebugMesh.scale.set(width, height, 1);
+      enemy.ciapetHitboxDebugMesh.updateMatrixWorld(true);
+      enemy.ciapetHitboxDebug.update();
+    }
+
+    function disposeEnemyHitboxDebug(enemy) {
+      if (enemy.ciapetHitboxDebug) {
+        scene.remove(enemy.ciapetHitboxDebug);
+        enemy.ciapetHitboxDebug.geometry.dispose();
+        enemy.ciapetHitboxDebug.material.dispose();
+        enemy.ciapetHitboxDebug = null;
+      }
+
+      if (enemy.ciapetHitboxDebugMesh) {
+        scene.remove(enemy.ciapetHitboxDebugMesh);
+        enemy.ciapetHitboxDebugMesh.geometry.dispose();
+        enemy.ciapetHitboxDebugMesh.material.dispose();
+        enemy.ciapetHitboxDebugMesh = null;
+      }
+    }
+
     function isSolidAtPoint(x, y) {
       return collidableObjects.some((object) => (
+        object.active &&
         x > object.left &&
         x < object.right &&
         y > object.bottom &&
@@ -1834,7 +3339,7 @@
     function wouldEnemyHitWall(enemy, nextX) {
       const nextBounds = createBounds(nextX, enemy.mesh.position.y, enemyHitboxWidth, enemyHitboxHeight);
 
-      return collidableObjects.some((object) => hasAABBOverlap(nextBounds, object));
+      return collidableObjects.some((object) => object.active && hasAABBOverlap(nextBounds, object));
     }
 
     function createEnemyTexture(baseTexture, direction) {
@@ -1975,45 +3480,83 @@
       );
     }
 
+    function squashEnemy(enemy) {
+      enemy.isDead = true;
+      enemy.active = false;
+      enemy.deathMode = 'squished';
+      enemy.squishTimer = 0.13;
+      enemy.bounds = createBounds(enemy.mesh.position.x, enemy.mesh.position.y, 0, 0);
+      if (enemy.ciapetHitboxDebug) {
+        enemy.ciapetHitboxDebug.visible = false;
+      }
+      enemy.mesh.rotation.z = 0;
+      enemy.mesh.position.y -= enemyHitboxHeight * 0.4;
+      enemy.mesh.scale.y = 0.2;
+      triggerScreenShake(0.12, 0.18);
+    }
+
     function updateEnemies(deltaTime) {
       for (let index = enemies.length - 1; index >= 0; index -= 1) {
         const enemy = enemies[index];
 
         if (enemy.isDead) {
+          if (enemy.deathMode === 'squished') {
+            enemy.squishTimer -= deltaTime;
+
+            if (enemy.squishTimer <= 0) {
+              disposeEnemy(enemy);
+              enemies.splice(index, 1);
+            }
+
+            continue;
+          }
+
           enemy.deathVelocityY += gravity * deltaTime;
           enemy.mesh.position.y += enemy.deathVelocityY * deltaTime;
 
           if (enemy.mesh.position.y < levelBottom - 6) {
-            scene.remove(enemy.mesh);
-            enemy.mesh.geometry.dispose();
-            enemy.mesh.material.dispose();
-            const levelObjectIndex = levelObjects.indexOf(enemy.mesh);
-
-            if (levelObjectIndex !== -1) {
-              levelObjects.splice(levelObjectIndex, 1);
-            }
-
+            disposeEnemy(enemy);
             enemies.splice(index, 1);
           }
 
           continue;
         }
 
+        if (!enemy.active) {
+          continue;
+        }
+
         if (enemy.type === 'mobile') {
+          const previousBottom = enemy.bounds.bottom;
           const nextX = enemy.mesh.position.x + enemy.direction * enemySpeed * deltaTime;
           const footX = nextX + enemy.direction * (enemyHitboxWidth / 2 + 0.08);
-          const footY = enemy.bounds.bottom - 0.2;
+          const footY = enemy.bounds.bottom - 0.14;
           const isGroundAhead = isSolidAtPoint(footX, footY);
           const hitWall = wouldEnemyHitWall(enemy, nextX);
-          const outsidePlatform = enemy.platformBounds && (
-            nextX - enemyHitboxWidth / 2 < enemy.platformBounds.left + 0.04 ||
-            nextX + enemyHitboxWidth / 2 > enemy.platformBounds.right - 0.04
-          );
 
-          if (outsidePlatform || !isGroundAhead || hitWall) {
+          if (!isGroundAhead || hitWall) {
             enemy.direction *= -1;
           } else {
             enemy.mesh.position.x = nextX;
+          }
+
+          enemy.velocityY = (enemy.velocityY || 0) + gravity * deltaTime;
+          enemy.mesh.position.y += enemy.velocityY * deltaTime;
+          updateEnemyBounds(enemy);
+
+          for (const object of collidableObjects) {
+            if (!object.active) {
+              continue;
+            }
+
+            if (!hasAABBOverlap(enemy.bounds, object) || enemy.velocityY > 0 || previousBottom < object.top - 0.08) {
+              continue;
+            }
+
+            enemy.mesh.position.y = object.top + enemyHitboxHeight / 2;
+            enemy.velocityY = 0;
+            updateEnemyBounds(enemy);
+            break;
           }
         }
 
@@ -2041,7 +3584,7 @@
           projectileSize
         );
 
-        const hitSolid = collidableObjects.some((object) => hasAABBOverlap(projectile.bounds, object));
+        const hitSolid = collidableObjects.some((object) => object.active && hasAABBOverlap(projectile.bounds, object));
         const offscreenLeft = projectile.mesh.position.x < camera.position.x + camera.left - 2;
         const offscreenRight = projectile.mesh.position.x > camera.position.x + camera.right + 2;
 
@@ -2072,22 +3615,58 @@
       }
     }
 
+    function removeCollidableObject(object) {
+      if (object.debugHelper) {
+        scene.remove(object.debugHelper);
+        object.debugHelper.geometry.dispose();
+        object.debugHelper.material.dispose();
+        const helperIndex = blockHitboxHelpers.indexOf(object.debugHelper);
+
+        if (helperIndex !== -1) {
+          blockHitboxHelpers.splice(helperIndex, 1);
+        }
+      }
+
+      removeTrackedMesh(object.mesh);
+    }
+
+    function isWithinActiveCameraRange(x) {
+      return x >= camera.position.x - cullingLeftDistance && x <= camera.position.x + cullingRightDistance;
+    }
+
+    function disposeEnemy(enemy) {
+      disposeEnemyHitboxDebug(enemy);
+      removeTrackedMesh(enemy.mesh);
+    }
+
     function cleanupOffscreenGroundTiles() {
+      return;
+    }
+
+    function updateDynamicCulling() {
       if (!isGameStarted) {
         return;
       }
 
-      const cleanupLimit = camera.position.x + camera.left - 3;
-
       for (let index = collidableObjects.length - 1; index >= 0; index -= 1) {
         const object = collidableObjects[index];
 
-        if (object.right >= cleanupLimit) {
-          continue;
+        object.active = isWithinActiveCameraRange(object.mesh.position.x);
+        object.mesh.visible = object.active;
+        if (object.debugHelper) {
+          object.debugHelper.visible = SHOW_DEBUG_HITBOXES && object.active;
+          object.debugHelper.update();
         }
+      }
 
-        removeTrackedMesh(object.mesh);
-        collidableObjects.splice(index, 1);
+      for (let index = enemies.length - 1; index >= 0; index -= 1) {
+        const enemy = enemies[index];
+
+        enemy.active = isWithinActiveCameraRange(enemy.mesh.position.x);
+        enemy.mesh.visible = enemy.active || enemy.isDead;
+        if (enemy.type === 'shooter') {
+          updateEnemyBounds(enemy);
+        }
       }
     }
 
@@ -2101,6 +3680,8 @@
 
       for (const projectile of projectiles) {
         if (hasAABBOverlap(playerBounds, projectile.bounds)) {
+          triggerDamageFlash();
+          triggerScreenShake(0.28, 0.55);
           showGameOverMenu();
           return;
         }
@@ -2116,21 +3697,23 @@
       const playerBounds = getPlayerBoundsFromHitbox();
 
       for (const enemy of enemies) {
-        if (enemy.isDead || !hasAABBOverlap(playerBounds, enemy.bounds)) {
+        const enemyBounds = enemy.type === 'shooter' ? enemy.ciapetHitbox : enemy.bounds;
+
+        if (enemy.isDead || !enemy.active || !enemyBounds || !hasAABBOverlap(playerBounds, enemyBounds)) {
           continue;
         }
 
-        const stompedEnemy = playerVelocity.y < 0 && previousPlayerBottom >= enemy.bounds.top - 0.08;
+        const stompedEnemy = playerVelocity.y < 0 && previousPlayerBottom >= enemyBounds.top - 0.08;
 
         if (stompedEnemy) {
-          enemy.isDead = true;
-          enemy.deathVelocityY = 1.5;
-          enemy.mesh.rotation.z = enemy.direction * 0.25;
+          squashEnemy(enemy);
           playerVelocity.y = 8;
           isGrounded = false;
           return;
         }
 
+        triggerDamageFlash();
+        triggerScreenShake(0.28, 0.55);
         showGameOverMenu();
         return;
       }
@@ -2147,6 +3730,11 @@
         return;
       }
 
+      if (currentLevelCoinsCollected < 3) {
+        showTemporaryLevelMessage('Non puoi passare! Trova tutte e 3 le monete obbligatorie!');
+        return;
+      }
+
       isChangingLevel = true;
       isGameStarted = false;
       playerVelocity.set(0, 0);
@@ -2160,15 +3748,17 @@
         return;
       }
 
-      const horizontalDirection = Number(keys.right) - Number(keys.left);
+      const keyboardDirection = Number(keys.right) - Number(keys.left);
+      const horizontalDirection = mobileInputX !== 0 ? mobileInputX : keyboardDirection;
       playerVelocity.x = horizontalDirection * moveSpeed;
 
       if (horizontalDirection !== 0) {
-        playerFacingDirection = horizontalDirection;
+        playerFacingDirection = Math.sign(horizontalDirection);
         updatePlayerVisualScale();
       }
 
       if (jumpRequested && isGrounded) {
+        spawnJumpDust();
         playerVelocity.y = jumpVelocity;
         isGrounded = false;
       }
@@ -2181,13 +3771,23 @@
       const previousBottom = previousPlayerBottom;
       const previousTop = playerHitbox.max.y;
 
-      player.position.x += playerVelocity.x * deltaTime;
-      resolveHorizontalCollisions();
-      clampPlayerToCameraLeftEdge();
-
       isGrounded = false;
       player.position.y += playerVelocity.y * deltaTime;
       resolveVerticalCollisions(previousBottom, previousTop);
+
+      player.position.x += playerVelocity.x * deltaTime;
+      resolveHorizontalCollisions();
+      clampPlayerToLevelStart();
+
+      if (isGrounded && !hasGroundSupport()) {
+        isGrounded = false;
+      }
+
+      runDustTimer -= deltaTime;
+      if (isGrounded && Math.abs(playerVelocity.x) > moveSpeed * 0.45 && runDustTimer <= 0) {
+        spawnRunDust();
+        runDustTimer = 0.075;
+      }
     }
 
     function setPlayerTexture(texture) {
@@ -2241,6 +3841,10 @@
     }
 
     function handleResize() {
+      if (isMobilePortrait()) {
+        return;
+      }
+
       updateCameraBounds();
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -2248,11 +3852,12 @@
 
     function updateCamera() {
       if (isGameStarted) {
-        maxCameraX = Math.max(maxCameraX, player.position.x);
+        maxCameraX = Math.max(player.position.x, 0);
       }
 
       camera.position.x = maxCameraX;
       camera.position.y = 0;
+      camera.position.z = 10;
       camera.lookAt(camera.position.x, camera.position.y, 0);
 
       for (const { layer, parallax } of backgroundLayers) {
@@ -2260,10 +3865,29 @@
       }
     }
 
+    function applyScreenShake(deltaTime) {
+      if (screenShakeTimer <= 0) {
+        return;
+      }
+
+      screenShakeTimer -= deltaTime;
+      const strength = screenShakeIntensity * Math.max(screenShakeTimer / screenShakeDuration, 0);
+      camera.position.y += Math.random() * strength - strength / 2;
+      camera.position.z += Math.random() * strength - strength / 2;
+    }
+
     function animate() {
       const deltaTime = Math.min(clock.getDelta(), 0.05);
 
+      if (isPaused) {
+        renderer.render(scene, camera);
+        return;
+      }
+
       updatePlayerHitbox();
+      updateDynamicCulling();
+      updateDamageFlash(deltaTime);
+      updateDustParticles(deltaTime);
       updatePlayer(deltaTime);
       updateEnemies(deltaTime);
       updateProjectiles(deltaTime);
@@ -2275,7 +3899,8 @@
       checkLevelComplete();
       updatePlayerTexture();
       updateCamera();
-      cleanupOffscreenGroundTiles();
+      applyScreenShake(deltaTime);
+      updateDynamicCulling();
       renderer.render(scene, camera);
     }
 
@@ -2284,32 +3909,48 @@
     updateCoinCounter();
     updateSpecialCoinUI();
     showMainMenu();
+    updatePauseButtonVisibility();
     renderer.setAnimationLoop(animate);
 
-    prevLevelButton.addEventListener('click', () => {
-      if (selectedMenuLevel > 0) {
-        selectedMenuLevel -= 1;
+    prevZonePageButton.addEventListener('click', () => {
+      if (selectedZonePage > 0) {
+        selectedZonePage -= 1;
         updateMainMenu();
       }
     });
 
-    nextLevelButton.addEventListener('click', () => {
-      if (selectedMenuLevel < totalLevels - 1) {
-        selectedMenuLevel += 1;
+    nextZonePageButton.addEventListener('click', () => {
+      const totalZonePages = Math.ceil(levelsPerZone / levelsPerZonePage);
+
+      if (selectedZonePage < totalZonePages - 1) {
+        selectedZonePage += 1;
         updateMainMenu();
       }
     });
 
-    playButton.addEventListener('click', startSelectedLevel);
+    backToZonesButton.addEventListener('click', showZoneHub);
     winMainMenuButton.addEventListener('click', returnToMainMenuFromWin);
     winReplayButton.addEventListener('click', restartCurrentLevel);
     winNextButton.addEventListener('click', goToNextLevel);
     gameOverMainMenuButton.addEventListener('click', returnToMainMenuFromGameOver);
     gameOverRestartButton.addEventListener('click', restartCurrentLevelFromGameOver);
+    pauseButton.addEventListener('pointerdown', togglePause);
+    pauseMenu.addEventListener('contextmenu', (event) => event.preventDefault());
+    pauseMenu.addEventListener('touchmove', (event) => event.preventDefault(), { passive: false });
+    resumeButton.addEventListener('pointerdown', resumeGame);
+    pauseRestartButton.addEventListener('pointerdown', restartFromPause);
+    pauseMainMenuButton.addEventListener('pointerdown', returnToMainMenuFromPause);
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    mobileControls.addEventListener('contextmenu', (event) => event.preventDefault());
+    mobileControls.addEventListener('touchmove', (event) => event.preventDefault(), { passive: false });
+    joystickBase.addEventListener('pointerdown', handleJoystickPointerDown);
+    joystickBase.addEventListener('pointermove', handleJoystickPointerMove);
+    joystickBase.addEventListener('pointerup', handleJoystickPointerUp);
+    joystickBase.addEventListener('pointercancel', handleJoystickPointerUp);
+    jumpButton.addEventListener('pointerdown', handleMobileJump);
   </script>
 </body>
 </html>
